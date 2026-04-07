@@ -1,0 +1,11 @@
+{
+  "name": "haflingmax-skills",
+  "description": "Gold-standard Claude Code skills for frontend architecture and development",
+  "version": "1.0.0",
+  "author": {
+    "name": "haflingmax"
+  },
+  "repository": "https://github.com/haflingmax/claude-skills",
+  "license": "MIT",
+  "keywords": ["nextjs", "react", "architecture", "skills"]
+}

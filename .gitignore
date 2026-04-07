@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code local state (NOT .claude-plugin — that's the plugin manifest)
+.claude/
+
+# Temp
+*.tmp
+*.bak
