@@ -7,19 +7,19 @@ Gold-standard Claude Code skills for frontend architecture and development.
 ### 1. Add as marketplace
 
 ```bash
-/plugin marketplace add haflingmax/claude-skills
+/plugin marketplace add haflingmax/haflingmax-claude-skills
 ```
 
 ### 2. Install the plugin
 
 ```bash
-/plugin install haflingmax-skills@haflingmax-claude-skills
+/plugin install haflingmax-skills@haflingmax-haflingmax-claude-skills
 ```
 
 Or via CLI:
 
 ```bash
-claude plugin install haflingmax-skills@haflingmax-claude-skills
+claude plugin install haflingmax-skills@haflingmax-haflingmax-claude-skills
 ```
 
 After installation, skills are available automatically. Claude Code detects and invokes
