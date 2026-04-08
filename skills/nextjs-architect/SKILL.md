@@ -43,6 +43,9 @@ Thinking "just this once"? Stop. That is rationalization.
 ## Phased Workflow
 
 You MUST complete each phase before proceeding to the next.
+**After each phase — review your work before moving on.** Check the gate condition,
+verify nothing was missed, and confirm with the user if the task is non-trivial.
+Do not batch all review to the end.
 
 ### Phase 1: Detection
 
@@ -74,7 +77,8 @@ If `.github/workflows/` exists → `references/cicd-pipeline.md`.
 **tsconfig.json:** If `baseUrl` is present — remove it (deprecated in TS 6.0, removed in TS 7.0).
 Use `paths` with relative prefixes instead: `"@/*": ["./src/*"]`. No `baseUrl` needed since TS 4.1.
 
-**You cannot proceed to Phase 2 without knowing: framework, styling, testing, infra.**
+**Gate:** You cannot proceed to Phase 2 without knowing: framework, styling, testing, infra.
+**Review:** Confirm detection results are correct. If unsure about any signal — ask the user.
 
 ### Phase 2: Architecture
 
@@ -161,7 +165,9 @@ Features don't import other features. Compose at `app/` or extract to `entities/
 For component file patterns, read `references/component-patterns.md`.
 For advanced routing (parallel, intercepting, PPR), read `references/advanced-routing.md`.
 
-**You cannot proceed to Phase 3 without knowing: which model and which folder this code belongs in.**
+**Gate:** You cannot proceed to Phase 3 without knowing: which model and which folder this code belongs in.
+**Review:** Verify the folder structure matches the chosen model. Check dependency direction.
+For non-trivial features — present the architecture decision to the user before implementing.
 
 ### Phase 3: Implementation
 
@@ -225,7 +231,9 @@ export default function Page() {
 - i18n → `references/i18n.md`
 - Semantic variants → `references/semantic-variants.md`
 
-**You cannot proceed to Phase 4 without: component implemented, test written, story created (if Storybook).**
+**Gate:** You cannot proceed to Phase 4 without: component implemented, test written, story created (if Storybook).
+**Review:** Re-read the code you just wrote. Check: `import type` for types, no `any`,
+no business logic in `app/`, correct `"use client"` boundaries. Fix issues before Phase 4.
 
 ### Phase 4: Verification
 
