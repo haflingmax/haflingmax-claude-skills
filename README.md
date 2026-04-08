@@ -1,6 +1,6 @@
 # haflingmax-skills
 
-Gold-standard Claude Code skills for frontend architecture and development.
+Curated skills for software engineering, business analysis, and strategic planning — battle-tested patterns that make Claude Code agents more effective.
 
 ## Installation
 

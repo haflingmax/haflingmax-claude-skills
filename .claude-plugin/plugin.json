@@ -1,11 +1,11 @@
 {
   "name": "haflingmax-skills",
-  "description": "Gold-standard Claude Code skills for frontend architecture and development",
+  "description": "Curated skills for software engineering, business analysis, and strategic planning — battle-tested patterns that make Claude Code agents more effective",
   "version": "1.0.0",
   "author": {
-    "name": "haflingmax"
+    "name": "Alexander Shilov"
   },
-  "repository": "https://github.com/haflingmax/claude-skills",
+  "repository": "https://github.com/haflingmax/haflingmax-claude-skills",
   "license": "MIT",
   "keywords": ["nextjs", "react", "architecture", "skills"]
 }
