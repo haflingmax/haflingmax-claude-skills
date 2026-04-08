@@ -204,7 +204,7 @@ export default function Page() {
 | Topic | Rule |
 |-------|------|
 | State | Server Components for server data. Context/Zustand for UI. No `useState+useEffect` for fetching in Next.js. |
-| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). **With `verbatimModuleSyntax: true`: always use `import type` for interfaces, type aliases, and type-only re-exports. Never import a TypeScript type as a value — Vite/esbuild will crash at runtime even if tsc passes.** |
+| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). **Always use `import type` for interfaces, type aliases, and type-only re-exports.** Without this, esbuild/swc (used by Vite, Next.js turbopack) leave the import in JS output → runtime crash. With `verbatimModuleSyntax: true` (Vite default), tsc enforces this via TS1484. Without it, tsc is silent but runtime still breaks. |
 | Performance | `next/image` with `sizes`, `next/font`, `next/dynamic`. No deep barrel files. |
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
@@ -273,10 +273,10 @@ If you catch yourself thinking any of these, pause:
   → New code follows the rules. Suggest refactoring in review mode.
 - "I'll copy this import block from the original file"
   → Check every imported symbol: is it a runtime value (function, class, const) or a type
-    (interface, type alias)? With `verbatimModuleSyntax`, type-only imports MUST use
-    `import type { X }` or `import { type X }`. Vite strips type-only imports at build time;
-    if you import a type as a value, the bundle tries to find a JS export that doesn't exist
-    → white screen in browser, no error from tsc.
+    (interface, type alias)? Always use `import type { X }` or `import { type X }` for types.
+    esbuild/swc (Vite, Turbopack) don't type-check — they leave value imports in JS output.
+    If the symbol is type-only, the JS import fails at runtime (white screen).
+    `verbatimModuleSyntax: true` makes tsc catch this (TS1484), but without it tsc is silent.
 
 ### Red Flags in Existing Code (Review Mode)
 
@@ -291,9 +291,8 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - `typeof window !== 'undefined'` in render output — causes hydration mismatch
 - `cookies()`/`headers()` inside `"use cache"` — runtime error, read outside and pass as args
 - Tailwind v3 syntax in a v4 project (`bg-opacity-*`, `tailwind.config.js`)
-- Type-only symbols imported without `import type` when `verbatimModuleSyntax` is enabled
-  (grep for interfaces/types from external packages imported as values — common after
-  refactoring/extraction)
+- Type-only symbols imported without `import type` (common after refactoring/extraction;
+  with `verbatimModuleSyntax` tsc catches via TS1484, without it only runtime reveals the bug)
 
 ---
 
