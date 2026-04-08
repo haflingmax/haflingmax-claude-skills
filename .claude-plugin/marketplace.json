@@ -1,20 +1,18 @@
 {
-  "name": "haflingmax-skills",
+  "name": "haflingmax-claude-skills",
+  "description": "Curated skills for software engineering, business analysis, and strategic planning",
   "owner": {
     "name": "Alexander Shilov"
-  },
-  "metadata": {
-    "description": "Curated skills for software engineering, business analysis, and strategic planning"
   },
   "plugins": [
     {
       "name": "haflingmax-skills",
-      "source": ".",
-      "description": "Next.js and React architecture skill with industry-standard patterns",
-      "version": "1.0.0",
-      "author": {
-        "name": "Alexander Shilov"
-      }
+      "description": "Next.js and React architecture skill with industry-standard engineering patterns",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/nextjs-architect"
+      ]
     }
   ]
 }
