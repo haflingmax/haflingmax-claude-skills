@@ -13,7 +13,7 @@ description: >
 **SERVER FIRST, ALWAYS.**
 
 Every component is a Server Component until you prove it needs client interactivity.
-Every file lives in `features/`, `entities/`, or `shared/` — never business logic in `app/`.
+Business logic never lives in `app/` — only routing files.
 Every component with state has a test. No `any`. No exceptions.
 
 <HARD-GATE>
@@ -72,31 +72,90 @@ If `.github/workflows/` exists → `references/cicd-pipeline.md`.
 
 ### Phase 2: Architecture
 
-Code organized by **business domain**. Inspired by Feature-Sliced Design (FSD).
-**Files that change together live together.**
+**Core principle: files that change together live together** (colocation).
+Detect existing structure first. If the project already has an organization — follow it.
+For new projects, choose a model based on scale:
+
+#### Model A: Vercel-Style (default for most projects)
+
+Used by Vercel's own apps (ai-chatbot, taxonomy). Flat root, domain grouping inside
+`components/` and `lib/`. No `src/` directory.
+
+```
+app/
+  (auth)/                  # Route group — auth pages + layout
+    actions.ts             # Server Actions colocated with route group
+    login/page.tsx
+    register/page.tsx
+  (dashboard)/             # Route group — protected area
+    _components/           # Private folder — route-specific components
+    actions.ts
+    overview/page.tsx
+    settings/page.tsx
+  api/webhooks/route.ts
+  layout.tsx, globals.css
+
+components/
+  ui/                      # shadcn primitives (button, input, dialog)
+  chat/                    # Domain-grouped components
+    ChatPanel.tsx
+    useChatPanel.ts
+    ChatMessage.tsx
+  billing/
+    PricingTable.tsx
+    usePricingTable.ts
+
+hooks/                     # Shared hooks (useDebounce, useMediaQuery)
+lib/
+  db/                      # Data Access Layer (schema, queries, migrations)
+  ai/                      # Domain logic
+  utils.ts, constants.ts
+```
+
+#### Model B: Feature-Sliced (large-scale apps, 20+ features)
+
+FSD-inspired layered architecture. Use when team > 5 devs or 20+ distinct features.
 
 ```
 src/
-  app/                    # ROUTING ONLY — thin files
-    layout.tsx, page.tsx, error.tsx, loading.tsx, middleware.ts
-    (marketing)/, (dashboard)/, api/webhooks/
-
-  features/               # Business features (add-to-cart, checkout, auth)
-  entities/               # Domain objects (product, user, order)
-  shared/                 # Reusable infra (ui/, lib/, hooks/, types/)
+  app/                     # Routing only
+  features/                # Business features (add-to-cart, checkout, auth)
+  entities/                # Domain objects (product, user, order)
+  shared/                  # Reusable infra (ui/, lib/, hooks/)
 ```
 
-**Rules:**
-1. `app → features → entities → shared`. Never upward.
-2. Features don't import other features. Compose at `app/` or extract to `entities/`.
-3. `app/` is thin: only routing files. Business logic lives elsewhere.
-4. `index.ts` for public API. No deep barrel re-exports.
-5. Smaller projects: flat `components/` + `lib/` is fine. Migrate at ~15-20 components.
+**Import direction:** `app → features → entities → shared`. Never upward.
+Features don't import other features. Compose at `app/` or extract to `entities/`.
 
-For component patterns, read `references/component-patterns.md`.
+#### File Organization Rules (both models)
+
+1. **`app/` is thin.** Only routing/convention files. Business logic lives elsewhere.
+2. **Every component group gets its own subfolder.** Never dump unrelated files flat
+   in one directory. When a component has 2+ companion files (hook, test, sub-component),
+   wrap them in a folder.
+3. **Colocate by default.** Component-specific hooks live next to the component.
+   Move to shared only when a second consumer appears.
+4. **Group related pages.** Auth pages (Login, Register, VerifyEmail) → one folder.
+   Settings tabs → one folder. Dashboard widgets → one folder.
+5. **Server Actions colocate with route groups:** `app/(feature)/actions.ts`.
+   Or with the feature: `components/chat/actions.ts`.
+6. **Data access in `lib/db/`** — DAL functions that validate auth before returning data.
+7. **No deep barrel re-exports.** `index.ts` at folder boundary only.
+
+#### Hook Placement
+
+| Scope | Location |
+|-------|----------|
+| Component-specific (1 consumer) | Next to component: `components/chat/useChatPanel.ts` |
+| Feature-specific (2+ in same group) | Feature root: `components/chat/useChat.ts` |
+| Shared across features (2+ unrelated consumers) | `hooks/useDebounce.ts` |
+
+**Never put a component-specific hook in the global `hooks/` directory.**
+
+For component file patterns, read `references/component-patterns.md`.
 For advanced routing (parallel, intercepting, PPR), read `references/advanced-routing.md`.
 
-**You cannot proceed to Phase 3 without knowing: which layer this code belongs in.**
+**You cannot proceed to Phase 3 without knowing: which model and which folder this code belongs in.**
 
 ### Phase 3: Implementation
 
@@ -161,7 +220,7 @@ export default function Page() {
 Before claiming work is complete, verify EVERY item:
 
 - [ ] Phase 1 complete — project context detected
-- [ ] Phase 2 complete — correct layer identified (shared/entity/feature/app)
+- [ ] Phase 2 complete — correct folder identified (not dumped flat, not in `app/`)
 - [ ] Server Component by default — `"use client"` only with justification
 - [ ] Logic/view separated if component has >1 useState or any useEffect
 - [ ] Styling matches project convention (one approach, not mixed)
@@ -186,7 +245,9 @@ If you catch yourself thinking any of these, pause:
 - "I'll add `use client` because I'm not sure how to do this with Server Components"
   → Use the composition pattern. Wrap only the interactive part.
 - "I'll put this component in `app/` because it's faster"
-  → Find the right feature. `app/` bloat is the #1 Next.js anti-pattern.
+  → `app/` is for routing only. Put it in `components/{domain}/` or `features/`.
+- "I'll put all files flat in one folder, it's simpler"
+  → Group by domain. Each component group gets its own subfolder when it has 2+ files.
 - "This component is too simple to need a separate hook"
   → If it has >1 useState or any useEffect, extract the hook.
 - "I'll skip the test, it's obvious this works"
@@ -194,7 +255,7 @@ If you catch yourself thinking any of these, pause:
 - "I'll use `any` for now and fix types later"
   → `any` spreads. Use `unknown` + type guards. Fix it now.
 - "The user said keep it simple, so I'll skip the structure"
-  → Simple structure IS the structure. features/entities/shared is simple.
+  → Simple structure IS the structure. `components/{domain}/` is simple.
 - "The existing code doesn't follow these patterns"
   → New code follows the rules. Suggest refactoring in review mode.
 
@@ -212,7 +273,7 @@ Use `references/review-checklist.md` for full audit. Key signals:
 
 | Excuse | Response |
 |--------|----------|
-| "This project is small, doesn't need features/entities" | Use features/entities. It costs nothing. Migrate pain costs weeks. Do it now. |
+| "This project is small, doesn't need structure" | Use `components/{domain}/` at minimum. Group files from day one. Costs nothing. |
 | "I'll refactor the architecture later" | No you won't. Architectural debt compounds. Structure it now. |
 | "Hook/view separation is overkill" | Skip for <20 lines. Otherwise extract. No debate. |
 | "Let's just use useState for server data" | Use Server Components. That is the point of Next.js. |

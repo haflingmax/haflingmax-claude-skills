@@ -92,6 +92,100 @@ export async function ProductList() {
 
 ---
 
+## File Grouping Rules
+
+**Core principle:** Colocate files that change together (Dodds, Abramov, Next.js docs).
+Extract to shared only when a second consumer appears.
+
+### Rule 1: Group When 2+ Files Belong Together
+
+A component with its hook + test = 3 files → own subfolder. Always.
+A single-file component (Divider, Icon) can stay flat.
+
+### Rule 2: Domain Grouping
+
+Group components by **business domain**, not technical type. This applies to
+both Vercel-style (`components/{domain}/`) and FSD-style (`features/{domain}/`).
+
+**Vercel-style (default):**
+```
+components/
+  chat/                        # Domain: chat feature
+    ChatPanel.tsx              # View
+    useChatPanel.ts            # Logic hook
+    ChatPanel.test.tsx         # Test
+    ChatMessage.tsx            # Sub-component
+    ChatInput.tsx
+  dashboard/
+    StatsPanel.tsx
+    useStatsPanel.ts
+    RevenueChart.tsx
+  settings/
+    Settings.tsx               # Tab switcher view
+    ProfileTab.tsx             # Sub-view
+    useProfileTab.ts           # Tab-specific hook
+    SecurityTab.tsx
+  auth/                        # Related pages grouped
+    LoginForm.tsx
+    RegisterForm.tsx
+    VerifyEmailForm.tsx
+    useAuth.ts                 # Shared auth hook
+  ui/                          # shadcn primitives
+    button.tsx, input.tsx, dialog.tsx
+```
+
+**FSD-style (large apps):**
+```
+features/
+  chat/
+    ChatPanel.tsx, useChatPanel.ts, ChatPanel.test.tsx
+  auth/
+    LoginForm.tsx, RegisterForm.tsx, useAuth.ts
+entities/
+  product/
+    ProductCard.tsx, useProduct.ts, product.types.ts
+shared/
+  ui/
+    Button/, Input/, Modal/
+  hooks/
+    useDebounce.ts, useMediaQuery.ts
+```
+
+### Rule 3: Hook Placement (colocation)
+
+| Scope | Location |
+|-------|----------|
+| Component-specific (1 consumer) | Next to component: `components/chat/useChatPanel.ts` |
+| Domain-shared (2+ in same domain) | Domain root: `components/auth/useAuth.ts` |
+| App-wide (2+ unrelated consumers) | `hooks/useDebounce.ts` or `shared/hooks/` |
+
+**Never put a component-specific hook in the global `hooks/` directory.**
+
+### Rule 4: Server Actions Placement
+
+| Pattern | Location |
+|---------|----------|
+| Route-scoped actions | `app/(feature)/actions.ts` — colocated with route group |
+| Feature-scoped actions | `components/chat/actions.ts` or `features/chat/actions.ts` |
+| Shared mutation logic | `lib/db/queries.ts` (DAL) |
+
+### Rule 5: Related Pages → Single Folder
+
+Pages sharing a domain concept group together:
+- `auth/` → Login, Register, VerifyEmail, ForgotPassword
+- `settings/` → ProfileTab, SecurityTab, NotificationsTab
+- `products/` → ProductList, ProductDetail, ProductEdit
+
+### Rule 6: Max 3-4 Levels of Nesting
+
+Per React docs recommendation. If deeper, restructure.
+
+Sources: Kent C. Dodds (Colocation), Bulletproof React (alan2207), Josh Comeau
+(File Structure), Next.js docs (Route Groups, Private Folders), Vercel AI Chatbot,
+Robert C. Martin (Screaming Architecture).
+
+---
+
 ## Component File Structure
 
 Adapt to complexity. Trivial components (Divider, Icon) can be a single file.
