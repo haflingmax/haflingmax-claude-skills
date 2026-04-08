@@ -17,7 +17,8 @@ Business logic never lives in `app/` — only routing files.
 Every component with state has a test. No `any`. No exceptions.
 
 <HARD-GATE>
-Do NOT write any component, page, or feature without first completing Phase 1 (Detection).
+For multi-file tasks: Do NOT start without a plan (Phase 0 → superpowers:writing-plans).
+Do NOT write any component without first completing Phase 1 (Detection).
 Do NOT ship any component without passing the Phase 4 (Verification) checklist.
 Violating the letter of these rules is violating the spirit of the rules.
 Thinking "just this once"? Stop. That is rationalization.
@@ -46,6 +47,19 @@ You MUST complete each phase before proceeding to the next.
 **After each phase — review your work before moving on.** Check the gate condition,
 verify nothing was missed, and confirm with the user if the task is non-trivial.
 Do not batch all review to the end.
+
+### Phase 0: Planning (multi-file tasks)
+
+For tasks involving 3+ files or 2+ components:
+
+**REQUIRED SUB-SKILL:** Invoke `superpowers:writing-plans` to create an implementation
+plan BEFORE starting Phase 1. Do NOT skip planning and jump to detection/implementation.
+
+The plan must specify: what components to create, which folders they belong in,
+dependency order, and testing approach. nextjs-architect provides the architecture
+rules — writing-plans provides the execution structure.
+
+For single-file changes or trivial edits — skip Phase 0, start at Phase 1.
 
 ### Phase 1: Detection
 
@@ -322,16 +336,20 @@ Use `references/review-checklist.md` for full audit. Key signals:
 
 ## Integration with Other Skills
 
-**+ brainstorming** — Brainstorm feature design before Phase 2. Architecture decisions
-are easier when scope is clear.
+**Required workflow skills:**
+- **REQUIRED SUB-SKILL:** `superpowers:writing-plans` — Create implementation plan
+  BEFORE Phase 1 for tasks with 3+ files. Do NOT skip to implementation without a plan.
+- **REQUIRED SUB-SKILL:** `superpowers:verification-before-completion` — Run verification
+  commands in Phase 4 before claiming work is done. Evidence before assertions.
 
-**+ test-driven-development** — TDD requires testable components. Logic/view separation
-makes this possible.
-
-**+ systematic-debugging** — Common Next.js bugs (hydration mismatch, stale cache,
-missing Suspense) have specific diagnostic paths. Gather evidence first.
-
-**+ requesting-code-review** — Use the Phase 4 checklist as review criteria.
+**Recommended skills (invoke when applicable):**
+- `superpowers:brainstorming` — Brainstorm design before Phase 0/Phase 2.
+  Architecture decisions are easier when scope is clear.
+- `superpowers:test-driven-development` — TDD requires testable components.
+  Logic/view separation makes this possible.
+- `superpowers:systematic-debugging` — Common Next.js bugs (hydration mismatch,
+  stale cache, missing Suspense) have specific diagnostic paths.
+- `superpowers:requesting-code-review` — Use the Phase 4 checklist as review criteria.
 
 ---
 
