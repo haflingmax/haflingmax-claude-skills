@@ -6,8 +6,8 @@
   },
   "plugins": [
     {
-      "name": "haflingmax-skills",
-      "description": "Next.js and React architecture skill with industry-standard engineering patterns",
+      "name": "nextjs-architect",
+      "description": "Next.js and React architecture skill with industry-standard engineering patterns, phased workflow, and mandatory planning",
       "source": "./",
       "strict": false,
       "skills": [

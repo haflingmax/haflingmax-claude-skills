@@ -13,13 +13,13 @@ Curated skills for software engineering, business analysis, and strategic planni
 ### 2. Install the plugin
 
 ```bash
-/plugin install haflingmax-skills@haflingmax-claude-skills
+/plugin install nextjs-architect@haflingmax-claude-skills
 ```
 
 Or via CLI:
 
 ```bash
-claude plugin install haflingmax-skills@haflingmax-claude-skills
+claude plugin install nextjs-architect@haflingmax-claude-skills
 ```
 
 After installation, skills are available automatically. Claude Code detects and invokes
