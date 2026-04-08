@@ -68,6 +68,9 @@ If `.github/workflows/` exists → `references/cicd-pipeline.md`.
 
 **Env vars:** `NEXT_PUBLIC_*` for client-visible only. Validate with Zod. Never commit `.env.local`.
 
+**tsconfig.json:** If `baseUrl` is present — remove it (deprecated in TS 6.0, removed in TS 7.0).
+Use `paths` with relative prefixes instead: `"@/*": ["./src/*"]`. No `baseUrl` needed since TS 4.1.
+
 **You cannot proceed to Phase 2 without knowing: framework, styling, testing, infra.**
 
 ### Phase 2: Architecture
@@ -198,7 +201,7 @@ export default function Page() {
 | Topic | Rule |
 |-------|------|
 | State | Server Components for server data. Context/Zustand for UI. No `useState+useEffect` for fetching in Next.js. |
-| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. |
+| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). |
 | Performance | `next/image` with `sizes`, `next/font`, `next/dynamic`. No deep barrel files. |
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
@@ -266,6 +269,7 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - `useState` + `useEffect` for data fetching in Next.js
 - Missing `error.tsx` or `<Suspense>` boundaries
 - `any` types, `dangerouslySetInnerHTML` with user input, hardcoded secrets
+- `baseUrl` in tsconfig.json (deprecated TS 6.0 — remove and use relative `paths`)
 
 ---
 
