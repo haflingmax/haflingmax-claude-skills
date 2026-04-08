@@ -29,6 +29,12 @@ export async function submitContactAction(
   prevState: ContactState,
   formData: FormData
 ): Promise<ContactState> {
+  // Auth check — Server Actions are public endpoints, anyone can POST
+  // For public forms (contact), auth may not be needed — but rate-limit instead.
+  // For protected actions, always verify session:
+  // const user = await getCurrentUser()
+  // if (!user) return { message: 'Unauthorized' }
+
   const raw = Object.fromEntries(formData)
   const result = ContactSchema.safeParse(raw)
 
@@ -148,10 +154,19 @@ export function LikeButton({ likes, postId }: { likes: number; postId: string })
 
 ## Authentication / Route Protection
 
-### Middleware Pattern (Next.js 15)
+### CRITICAL: Middleware is NOT a Security Boundary
+
+Middleware can be bypassed (CVE-2025-29927 via `x-middleware-subrequest` header).
+Use middleware for **UX redirects only** (redirect unauthenticated users to login).
+Always enforce auth independently in the DAL, Server Actions, and Route Handlers.
+
+> **Every Server Action is a public HTTP endpoint.** Anyone can POST to it directly.
+> Always validate authentication inside the action, not just input shape.
+
+### Middleware Pattern (Next.js 15) — UX redirects only
 
 ```tsx
-// middleware.ts
+// middleware.ts — convenience redirects, NOT security enforcement
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 

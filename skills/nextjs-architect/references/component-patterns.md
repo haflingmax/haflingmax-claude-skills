@@ -224,12 +224,19 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   (`page.tsx`, `layout.tsx`, `error.tsx`, `loading.tsx`, `not-found.tsx`, `default.tsx`,
   `template.tsx`, `global-error.tsx`, `route.ts`).
 - **`ref` as a regular prop** (React 19+). Use `forwardRef` only for React 18 support.
+  Ref callbacks can now return a cleanup function — don't return other values.
 - **Discriminated unions** for mutually exclusive prop combinations.
 - **No inline styles.** Match project's styling approach.
 - **Prop spreading:** Destructure explicitly. Exception: headless UI libraries (Radix,
   Headless UI) and form libraries (React Hook Form `register()`) that provide spread
   props by design.
 - **No `any`.** Use `unknown` + type guards.
+- **No `JSX.Element` return type.** Removed in React 19. Use `React.JSX.Element` or
+  (preferred) let TypeScript infer the return type.
+- **No `defaultProps` on function components.** Removed in React 19 (silently ignored).
+  Use ES6 default parameters: `function Button({ size = 'md' }: ButtonProps)`.
+- **No `typeof window !== 'undefined'` in render.** Causes hydration mismatch.
+  Use `useEffect` for client-only logic.
 
 ---
 

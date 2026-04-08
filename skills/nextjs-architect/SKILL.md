@@ -60,8 +60,11 @@ Read at the start of ANY task:
 | `@storybook/*` in devDeps | **Storybook enabled** |
 | `reactCompiler: true` in next.config | **React Compiler** — skip manual memoization |
 
-**Styling:** Detect (Tailwind, CSS Modules, CSS-in-JS) and enforce consistency.
-Don't impose. Don't suggest CSS-in-JS migration unless concrete SSR issues.
+**Styling:** Detect and enforce consistency. Don't impose. Don't suggest CSS-in-JS
+migration unless concrete SSR issues. **Detect Tailwind version:**
+- v4: `@import "tailwindcss"` in CSS, `@theme` blocks, no `tailwind.config.js`
+- v3: `@tailwind base/components/utilities`, `tailwind.config.js` present
+- v4 syntax: opacity modifier `bg-blue-500/50` (not `bg-opacity-50`), `--color-*` prefix
 
 **Infrastructure:** If `docker-compose.yml` exists → `references/storybook-docker.md`.
 If `.github/workflows/` exists → `references/cicd-pipeline.md`.
@@ -207,6 +210,12 @@ export default function Page() {
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
 | Storybook | CSF3, `satisfies Meta`, `tags: ['autodocs']`, `play` functions. |
 
+**Security (critical):**
+- **Middleware is NOT a security boundary.** It can be bypassed (CVE-2025-29927).
+  Enforce auth in DAL, Server Actions, and Route Handlers independently.
+- **Server Actions are public HTTP endpoints.** Every exported action is callable via
+  direct POST. Always validate auth inside every Server Action, not just input shape.
+
 **Reference files for deeper guidance:**
 - Error handling, Suspense → `references/error-suspense.md`
 - Data fetching, caching, DAL, ISR → `references/data-patterns.md`
@@ -270,6 +279,11 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - Missing `error.tsx` or `<Suspense>` boundaries
 - `any` types, `dangerouslySetInnerHTML` with user input, hardcoded secrets
 - `baseUrl` in tsconfig.json (deprecated TS 6.0 — remove and use relative `paths`)
+- Auth only in middleware — middleware is NOT a security boundary (CVE-2025-29927)
+- Server Actions without auth checks — they are public HTTP endpoints, callable directly
+- `typeof window !== 'undefined'` in render output — causes hydration mismatch
+- `cookies()`/`headers()` inside `"use cache"` — runtime error, read outside and pass as args
+- Tailwind v3 syntax in a v4 project (`bg-opacity-*`, `tailwind.config.js`)
 
 ---
 

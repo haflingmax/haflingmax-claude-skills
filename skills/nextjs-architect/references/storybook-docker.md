@@ -88,6 +88,51 @@ Only report the task as complete AFTER the container health check passes.
 
 ## Key Gotchas
 - `NODE_OPTIONS="--max-old-space-size=4096"` is required — Storybook+Vite OOMs at default 512MB
+---
+
+## Next.js App Docker (Standalone)
+
+When deploying the Next.js app itself in Docker, use `output: 'standalone'` in `next.config.ts`.
+
+```ts
+// next.config.ts
+import type { NextConfig } from 'next'
+
+const config: NextConfig = {
+  output: 'standalone',
+}
+
+export default config
+```
+
+```dockerfile
+# Dockerfile
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# CRITICAL: standalone output excludes static files — you must copy them manually
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/standalone ./
+
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+**Common mistake:** Forgetting to copy `public/` and `.next/static` into the runner stage.
+Pages load but all CSS, images, and assets return 404.
 - Final nginx image is ~30MB (vs ~1.5GB for node image with dev server)
 - Use `npm run build-storybook -- --test` in CI to skip manager UI and speed up builds
 - Port 6006 externally maps to port 80 inside the container

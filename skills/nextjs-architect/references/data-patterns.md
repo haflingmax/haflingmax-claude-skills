@@ -127,6 +127,33 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 }
 ```
 
+### `"use cache"` Restrictions
+
+**Never call `cookies()`, `headers()`, or other request-scoped functions inside `"use cache"`.**
+They cause a runtime error because cached functions are detached from the request context.
+Read request data outside and pass as arguments:
+
+```tsx
+// WRONG — runtime error
+async function getProfile() {
+  'use cache'
+  const cookieStore = await cookies()  // ❌ Fails inside "use cache"
+  // ...
+}
+
+// CORRECT — pass as argument
+async function getProfile(sessionToken: string) {
+  'use cache'
+  cacheLife('minutes')
+  return db.user.findUnique({ where: { sessionToken } })
+}
+
+// Caller reads cookies outside the cache boundary
+const cookieStore = await cookies()
+const token = cookieStore.get('session')?.value
+const profile = await getProfile(token)
+```
+
 ### Next.js 16+
 
 ```tsx
