@@ -278,3 +278,112 @@ export function RecommendationList({ dataPromise }: { dataPromise: Promise<Produ
 - Wrap in `<Suspense>` — `use()` will suspend the component until the promise resolves.
 - Pass promises from Server to Client for streaming data without waterfalls.
 - Use `use(Context)` as a replacement for `useContext()` — it works the same way.
+
+---
+
+## State Management at Scale
+
+### When to Use What
+
+| State type | < 5 components | 5-20 components | 20+ components |
+|-----------|---------------|-----------------|----------------|
+| Simple UI toggle | `useState` | `useState` | `useState` |
+| Shared UI state (2-3 consumers) | React Context + `useReducer` | React Context | Zustand |
+| Complex UI state (theme, sidebar, cart) | Context is fine | Zustand | Zustand |
+| Async server state | Server Components | TanStack Query | TanStack Query |
+| URL state (filters, pagination) | `searchParams` | `nuqs` | `nuqs` |
+| Form state | `useActionState` | `useActionState` | `useActionState` + react-hook-form |
+
+### Zustand Store Structure
+
+```ts
+// stores/cart.ts — one store per domain concept
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+interface CartState {
+  items: CartItem[]
+  addItem: (item: CartItem) => void
+  removeItem: (id: string) => void
+  clear: () => void
+}
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set) => ({
+      items: [],
+      addItem: (item) => set((s) => ({ items: [...s.items, item] })),
+      removeItem: (id) => set((s) => ({ items: s.items.filter(i => i.id !== id) })),
+      clear: () => set({ items: [] }),
+    }),
+    { name: 'cart-storage' }
+  )
+)
+```
+
+**Rules:**
+- One store per domain concept (cart, theme, sidebar) — not one global store.
+- Use `persist` middleware for data that survives page reload (cart, preferences).
+- Use selectors to minimize re-renders: `useCartStore(s => s.items.length)`.
+- Never put server data in Zustand — use Server Components or TanStack Query.
+
+---
+
+## Typed API Clients
+
+For projects that call external APIs (not just database):
+
+### tRPC (full-stack TypeScript, same monorepo)
+
+Best when backend and frontend share a repo. Type-safe end-to-end without code generation.
+
+### openapi-typescript + openapi-fetch (external APIs with OpenAPI spec)
+
+```bash
+npx openapi-typescript https://api.example.com/openapi.json -o src/lib/api/schema.d.ts
+```
+
+```ts
+import createClient from 'openapi-fetch'
+import type { paths } from './schema'
+
+const client = createClient<paths>({ baseUrl: 'https://api.example.com' })
+
+const { data, error } = await client.GET('/products/{id}', {
+  params: { path: { id: '123' } },
+})
+// data is fully typed from the OpenAPI spec
+```
+
+### orval (OpenAPI → typed React Query hooks)
+
+Generates TanStack Query hooks from OpenAPI spec. Use when the backend provides OpenAPI.
+
+### Rules
+- Always type API responses. Never use `any` for API data.
+- Validate responses at runtime with Zod when calling untrusted external APIs.
+- Use Server Components or Route Handlers as proxy for external APIs — never expose
+  API keys to the client.
+
+---
+
+## Auth Library Integration
+
+For most projects, use an auth library instead of building from scratch:
+
+| Library | Best for | Session storage |
+|---------|----------|----------------|
+| **Auth.js (NextAuth v5)** | OAuth providers, built-in adapters | JWT or database |
+| **Clerk** | Managed auth, fast setup | Clerk-hosted |
+| **Lucia** | Self-hosted, full control | Database |
+| **Supabase Auth** | Supabase projects | Supabase |
+
+**Rules:**
+- Session tokens in HTTP-only cookies — never localStorage.
+- Middleware for UX redirects only (not security boundary — see `references/forms-auth.md`).
+- Verify session in DAL/Server Actions independently.
+- Use the library's middleware adapter when available.
+
+> **Note on `"use cache"`:** This directive is experimental/canary in Next.js 15 and expected
+> to be stable in Next.js 16. If using Next.js 15 stable, use `fetch()` with `revalidate`
+> option or `unstable_cache` instead. Check your Next.js version before using.

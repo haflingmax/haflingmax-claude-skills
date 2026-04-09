@@ -88,7 +88,7 @@ If `.github/workflows/` exists → `references/cicd-pipeline.md`.
 
 **Env vars:** `NEXT_PUBLIC_*` for client-visible only. Validate with Zod. Never commit `.env.local`.
 
-**tsconfig.json:** If `baseUrl` is present — remove it (deprecated in TS 6.0, removed in TS 7.0).
+**tsconfig.json:** If `baseUrl` is present — remove it (deprecated, will be removed in a future TS version).
 Use `paths` with relative prefixes instead: `"@/*": ["./src/*"]`. No `baseUrl` needed since TS 4.1.
 
 **Gate:** You cannot proceed to Phase 2 without knowing: framework, styling, testing, infra.
@@ -150,6 +150,24 @@ src/
 
 **Import direction:** `app → features → entities → shared`. Never upward.
 Features don't import other features. Compose at `app/` or extract to `entities/`.
+
+<Bad>
+```
+# WRONG — flat dump, logic in app/, no domain grouping
+app/
+  page.tsx              # Has 200 lines of business logic
+  dashboard/page.tsx    # Fetches data, transforms, renders — all in one
+components/
+  Button.tsx            # Flat — no folder, no test, no variants
+  Card.tsx              # Flat — stub with no states
+  Input.tsx             # Flat — no error state, no label association
+  UserProfile.tsx       # Should be in features, not here
+  DashboardChart.tsx    # Should be in features, not here
+hooks/
+  useAuth.ts            # Used by one component — should be colocated
+  useDashboard.ts       # Used by one page — should be next to it
+```
+</Bad>
 
 #### File Organization Rules (both models)
 
@@ -224,7 +242,7 @@ export default function Page() {
 | Topic | Rule |
 |-------|------|
 | State | Server Components for server data. Context/Zustand for UI. No `useState+useEffect` for fetching in Next.js. |
-| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). **Always use `import type` for interfaces, type aliases, and type-only re-exports.** Without this, esbuild/swc (used by Vite, Next.js turbopack) leave the import in JS output → runtime crash. With `verbatimModuleSyntax: true` (Vite default), tsc enforces this via TS1484. Without it, tsc is silent but runtime still breaks. |
+| TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated). **Always use `import type` for interfaces, type aliases, and type-only re-exports.** Without this, esbuild/swc (used by Vite, Next.js turbopack) leave the import in JS output → runtime crash. With `verbatimModuleSyntax: true` (Vite default), tsc enforces this via TS1484. Without it, tsc is silent but runtime still breaks. |
 | Performance | `next/image` with `sizes`, `next/font`, `next/dynamic`. No deep barrel files. |
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
 | UI Quality | Every interactive component MUST handle: hover, focus-visible, active, disabled, loading. No stub components. No hardcoded colors. No inline styles. No duplicates. Full catalog: `references/ui-quality.md`. |
@@ -262,7 +280,7 @@ Before claiming work is complete, verify EVERY item:
 - [ ] Styling matches project convention (one approach, not mixed)
 - [ ] Test file created and queries by `getByRole`
 - [ ] Story file created (if Storybook present)
-- [ ] `error.tsx` in route segment
+- [ ] `error.tsx` in route segments that fetch data or have async Server Components
 - [ ] `<Suspense>` with skeleton fallback around async content
 - [ ] Semantic HTML, keyboard accessible, labels linked
 - [ ] Strict TypeScript — no `any`, all params typed
@@ -326,7 +344,7 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - Duplicated component implementations (2+ Buttons/Inputs across project)
 - Inputs without `<label>`, forms without error states, selects without keyboard support
 - Inconsistent spacing, colors, or patterns across pages
-- `baseUrl` in tsconfig.json (deprecated TS 6.0 — remove and use relative `paths`)
+- `baseUrl` in tsconfig.json (deprecated — remove and use relative `paths`)
 - Auth only in middleware — middleware is NOT a security boundary (CVE-2025-29927)
 - Server Actions without auth checks — they are public HTTP endpoints, callable directly
 - `typeof window !== 'undefined'` in render output — causes hydration mismatch
@@ -391,9 +409,6 @@ All other components use **named exports**.
 
 ---
 
-> **Note for skill authors:** This is a domain-specific Reference skill. Its SKILL.md
-> (~1,600 words) deliberately exceeds the ~500-word target for technique/discipline skills
-> because it must encode detection logic, architecture rules, and version-specific guidance
-> that cannot be deferred to references without breaking the phased workflow. The tradeoff
-> is justified: this skill triggers on every React task, so the core must be self-sufficient
-> for the common path. Deep-dive content lives in 12 reference files (~7,000 words total).
+> **Skill architecture note:** Domain-specific Reference skills require detection logic,
+> architecture rules, and version-specific guidance in the core — these cannot be deferred
+> to references without breaking the phased workflow. Core: ~1,700 words. References: 14 files.

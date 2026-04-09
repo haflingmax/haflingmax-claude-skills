@@ -12,6 +12,7 @@ Every project must define tokens (CSS custom properties or Tailwind theme) for:
 |----------|---------|------|
 | **Color** | `--primary`, `--destructive`, `--muted` | Semantic + primitive. No raw hex in components. |
 | **Typography** | `--font-sans`, `--text-sm`, `--text-base` | Scale with consistent ratio. |
+| **Line height** | `--leading-tight` (1.25), `--leading-normal` (1.5) | Decreases as font size increases. Body ≥ 1.5 (WCAG). |
 | **Spacing** | 4px base: 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24 | No arbitrary values. |
 | **Border radius** | `--radius-sm` (4px), `--radius-md` (8px), `--radius-lg` (16px), `--radius-full` | 4-5 discrete values. |
 | **Shadow** | `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-xl` | 4-5 elevation levels. |
@@ -320,6 +321,32 @@ All feedback: `role="alert"` or `aria-live="polite"`.
 - **Page edit:** new records, many fields, dedicated route.
 - **All forms:** visible label, required indicator, grouped fields, logical tab order,
   disabled submit during submission with spinner, success/error feedback.
+
+### Drag and Drop
+
+- **Reordering lists/kanban:** use `@dnd-kit/core` (recommended). `react-beautiful-dnd` is deprecated.
+- Keyboard: Space to grab, Arrow keys to move, Space to drop, Escape to cancel.
+- Announce position changes to screen readers via `aria-live` region.
+- Visual feedback: grabbed item elevated (shadow), drop zone highlighted.
+- Persist order immediately or on explicit save — be consistent project-wide.
+
+### Optimistic UI Consistency
+
+- Define ONE pattern for optimistic updates. Don't mix approaches.
+- Rollback on server error: revert optimistic state, show toast explaining failure.
+- Show subtle visual indicator that data is pending confirmation (e.g., reduced opacity).
+- For lists: optimistic insert at correct position, fade in. Optimistic delete: fade out, undo toast.
+- With TanStack Query: use `onMutate`/`onError`/`onSettled` for structured optimistic flow.
+- With `useOptimistic`: state resets automatically on revalidation — handle the flash.
+
+### Performance Budgets / Web Vitals
+
+- **LCP** (Largest Contentful Paint): < 2.5s. Use `next/image` with `priority` for hero images.
+- **CLS** (Cumulative Layout Shift): < 0.1. Set explicit `width`/`height` on images, use `next/font`.
+- **INP** (Interaction to Next Paint): < 200ms. Keep event handlers fast, defer heavy work.
+- **Bundle size:** Track with `@next/bundle-analyzer`. Set budgets per route.
+- Suspense boundaries prevent CLS by reserving space with skeletons.
+- Monitor in production with Vercel Analytics, Web Vitals API, or SpeedCurve.
 
 ---
 

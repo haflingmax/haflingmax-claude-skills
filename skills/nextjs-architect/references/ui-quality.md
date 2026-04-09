@@ -182,8 +182,9 @@ Mobile-specific: touch drag gesture.
 ### Hover Card
 
 Trigger needs `aria-describedby`. Hover delay ~200ms open, ~300ms close grace area.
-NOT keyboard triggered — use Popover if keyboard access needed.
-**Anti-pattern:** critical content only in hover cards
+NOT keyboard triggered — **this is an accessibility concern**: screen reader users cannot
+access hover-only content. Use Popover if content must be keyboard-accessible.
+**Anti-pattern:** critical or interactive content only in hover cards
 
 ---
 
@@ -266,6 +267,57 @@ NOT keyboard triggered — use Popover if keyboard access needed.
 **ARIA:** `aria-busy="true"` on container, `aria-hidden="true"` on skeleton elements
 **Animation:** shimmer/pulse
 **Use for:** content with known layout (cards, tables, text blocks)
+
+---
+
+### ADDITIONAL COMPONENT TYPES
+
+### File Input / Dropzone
+
+**States:** idle, drag-over (highlight zone), uploading (progress), success, error (size/type rejection)
+**ARIA:** `role="button"` on drop zone with `aria-label="Upload file"`, `aria-describedby` for constraints (max size, types). Hidden `<input type="file">` triggered by click.
+**Keyboard:** Enter/Space opens file picker, drag-and-drop for mouse
+**Props:** accept (MIME types), maxSize, multiple, onDrop, disabled
+**Anti-patterns:** no file type/size validation before upload, no progress indicator, no error feedback
+
+### Date/Time Picker
+
+**Combination of:** Input + Popover + Calendar (+ time select)
+**ARIA:** inherits from all three. Input: `aria-describedby` for format hint. Calendar: full grid keyboard. Time: select or spinbutton.
+**Keyboard:** type in input, button opens calendar, full calendar keyboard (arrows, Page, Home/End), Tab to time fields
+**States:** union of Input + Calendar states + time selection
+**Anti-patterns:** custom date picker without keyboard support, no format validation, no timezone handling
+
+### Stepper / Wizard
+
+**ARIA:** `role="group"` with `aria-label="Progress"`, each step: `aria-current="step"` for active. Completed steps are links/buttons. Future steps are `aria-disabled`.
+**Keyboard:** Tab between step indicators (if clickable), standard form navigation within step content
+**States:** step-complete, step-active, step-upcoming, step-error
+**Must have:** back button, progress indication, validation before advancing
+**Anti-patterns:** no back navigation, losing form data on back, no step validation
+
+### Tree View
+
+**ARIA:** `role="tree"`, `role="treeitem"`, `aria-expanded` on branches, `aria-selected`, `aria-level`
+**Keyboard:** Arrow Up/Down move between visible items, Arrow Right expands/enters branch, Arrow Left collapses/goes to parent, Home/End, Enter selects, * expands all siblings
+**States:** expanded, collapsed, selected, focused, loading (lazy-load children)
+**Anti-patterns:** no keyboard navigation, no level indication for screen readers
+
+### Rich Text Editor
+
+**ARIA:** `role="textbox"`, `aria-multiline="true"`, `aria-label`. Toolbar: `role="toolbar"` with `aria-label`, buttons use `aria-pressed` for toggle formatting.
+**Keyboard:** standard text editing + Ctrl/Cmd shortcuts for formatting (B, I, U). Tab should exit editor (not insert tab), Escape from toolbar returns to editor.
+**States:** editing, read-only, disabled, focused, placeholder
+**Use:** Tiptap, Plate, or Lexical — never build from scratch.
+**Anti-patterns:** building custom editor instead of using a library, no keyboard shortcuts, no toolbar keyboard navigation
+
+### Drag and Drop (Reorder)
+
+**ARIA:** draggable items: `role="listitem"` in `role="list"`, `aria-grabbed` (deprecated) or `aria-roledescription="sortable"`. Use live region to announce position changes.
+**Keyboard:** Space to grab, Arrow keys to move, Space to drop, Escape to cancel.
+**Libraries:** `@dnd-kit/core` (recommended), `react-beautiful-dnd` (deprecated).
+**States:** idle, grabbed, dragging, drop-target-hover, dropped
+**Anti-patterns:** mouse-only drag (no keyboard), no announcement of position changes
 
 ---
 
