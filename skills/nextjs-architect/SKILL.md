@@ -227,8 +227,8 @@ export default function Page() {
 | TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). **Always use `import type` for interfaces, type aliases, and type-only re-exports.** Without this, esbuild/swc (used by Vite, Next.js turbopack) leave the import in JS output → runtime crash. With `verbatimModuleSyntax: true` (Vite default), tsc enforces this via TS1484. Without it, tsc is silent but runtime still breaks. |
 | Performance | `next/image` with `sizes`, `next/font`, `next/dynamic`. No deep barrel files. |
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
-| UI Quality | Every interactive component MUST handle: hover, focus-visible, active, disabled, loading states. No stub components. No hardcoded colors — use theme tokens only. No inline styles. No duplicated components. Read `references/ui-quality.md`. |
-| Design Consistency | One spacing scale, one color system, one component per concept. Extract inline JSX to shared component when pattern repeats 2+ times or exceeds 30 lines. CVA for variants. `cn()` for class merging. |
+| UI Quality | Every interactive component MUST handle: hover, focus-visible, active, disabled, loading. No stub components. No hardcoded colors. No inline styles. No duplicates. Full catalog: `references/ui-quality.md`. |
+| Design System | Tokens for color, spacing, radius, shadow, z-index, motion. One scale, one source. CVA for variants, `cn()` for merging. `prefers-reduced-motion` mandatory. Full rules: `references/design-system.md`. |
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
 | Storybook | CSF3, `satisfies Meta`, `tags: ['autodocs']`, `play` functions. |
 
