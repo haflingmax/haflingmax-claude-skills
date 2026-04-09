@@ -248,6 +248,11 @@ export default function Page() {
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
 | UI Quality | Every interactive component MUST handle: hover, focus-visible, active, disabled, loading. No stub components. No hardcoded colors. No inline styles. No duplicates. Full catalog: `references/ui-quality.md`. |
 | Design System | Tokens for color, spacing, radius, shadow, z-index, motion. One scale, one source. CVA for variants, `cn()` for merging. `prefers-reduced-motion` mandatory. Full rules: `references/design-system.md`. |
+| Naming | PascalCase components, camelCase hooks/utils, `handle*` for impl, `on*` for props, `is*` booleans, no `enum` (use `as const`). Full rules: `references/naming-conventions.md`. |
+| Security | CSP nonce in middleware, HSTS + X-Frame-Options in next.config, rate-limit Server Actions, `npm audit` in CI. `references/security-headers.md`. |
+| Tooling | ESLint strict + a11y + import order, Prettier + Tailwind plugin, Husky + lint-staged pre-commit, conventional commits. `references/tooling.md`. |
+| Code Quality | Functions ≤ 30 lines, components ≤ 150 lines, no magic numbers, no `console.log`, cleanup in `useEffect`. `references/code-quality.md`. |
+| Observability | Sentry for errors, structured logging (pino), Web Vitals monitoring, feature flags. `references/observability.md`. |
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
 | Storybook | CSF3, `satisfies Meta`, `tags: ['autodocs']`, `play` functions. |
 
@@ -292,6 +297,10 @@ Before claiming work is complete, verify EVERY item:
 - [ ] ui/ components in subfolders (not flat) when they have states/variants
 - [ ] `next/image` with `sizes`, `next/font` for fonts
 - [ ] `NEXT_PUBLIC_` only for client-visible env vars
+- [ ] Naming conventions followed (PascalCase components, `handle*`/`on*`, `is*` booleans)
+- [ ] No `console.log` — use structured logger for server-side
+- [ ] `useEffect` cleanup for subscriptions, timers, fetch (AbortController)
+- [ ] Import order: React → external → @/ → relative → types
 - [ ] Docker/CI updated if infrastructure exists
 
 **If any item fails, go back. Do not ship incomplete work.**
@@ -345,6 +354,10 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - Duplicated component implementations (2+ Buttons/Inputs across project)
 - Inputs without `<label>`, forms without error states, selects without keyboard support
 - Inconsistent spacing, colors, or patterns across pages
+- No security headers (CSP, HSTS) in production config
+- `console.log` in committed code (use structured logger)
+- Missing `useEffect` cleanup (timers, subscriptions, fetch without AbortController)
+- Inconsistent naming (mixing camelCase/PascalCase files, handle*/on* props)
 - `baseUrl` in tsconfig.json (deprecated — remove and use relative `paths`)
 - Auth only in middleware — middleware is NOT a security boundary (CVE-2025-29927)
 - Server Actions without auth checks — they are public HTTP endpoints, callable directly
