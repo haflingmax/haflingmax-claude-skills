@@ -196,6 +196,7 @@ hooks/
 
 For component file patterns, read `references/component-patterns.md`.
 For advanced routing (parallel, intercepting, PPR), read `references/advanced-routing.md`.
+For monorepo setup (Turborepo, shared packages), read `references/monorepo.md`.
 
 **Gate:** You cannot proceed to Phase 3 without knowing: which model and which folder this code belongs in.
 **Review:** Verify the folder structure matches the chosen model. Check dependency direction.
