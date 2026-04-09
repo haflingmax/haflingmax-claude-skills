@@ -188,7 +188,10 @@ Robert C. Martin (Screaming Architecture).
 
 ## Component File Structure
 
-Adapt to complexity. Trivial components (Divider, Icon) can be a single file.
+**ui/ components with states/variants MUST have their own subfolder** — not dumped flat.
+`button.tsx`, `input.tsx`, `select.tsx` as flat files in `ui/` is an anti-pattern when
+they have variants, tests, and stories. Only truly trivial components (Separator, Badge
+without interaction) can stay as single files.
 
 ```
 ComponentName/

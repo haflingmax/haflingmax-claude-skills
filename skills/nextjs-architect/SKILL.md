@@ -227,6 +227,8 @@ export default function Page() {
 | TypeScript | `strict: true`, `noUncheckedIndexedAccess`. No `any`. `satisfies` for configs. Zod at boundaries. No `baseUrl` in tsconfig (deprecated TS 6.0). **Always use `import type` for interfaces, type aliases, and type-only re-exports.** Without this, esbuild/swc (used by Vite, Next.js turbopack) leave the import in JS output → runtime crash. With `verbatimModuleSyntax: true` (Vite default), tsc enforces this via TS1484. Without it, tsc is silent but runtime still breaks. |
 | Performance | `next/image` with `sizes`, `next/font`, `next/dynamic`. No deep barrel files. |
 | Accessibility | Semantic HTML, keyboard, visible focus, touch >= 24px, labels, contrast 4.5:1, `aria-live`. |
+| UI Quality | Every interactive component MUST handle: hover, focus-visible, active, disabled, loading states. No stub components. No hardcoded colors — use theme tokens only. No inline styles. No duplicated components. Read `references/ui-quality.md`. |
+| Design Consistency | One spacing scale, one color system, one component per concept. Extract inline JSX to shared component when pattern repeats 2+ times or exceeds 30 lines. CVA for variants. `cn()` for class merging. |
 | Testing | Vitest + RTL (`getByRole`, `userEvent`). Playwright for E2E. MSW for mocking. |
 | Storybook | CSF3, `satisfies Meta`, `tags: ['autodocs']`, `play` functions. |
 
@@ -265,6 +267,10 @@ Before claiming work is complete, verify EVERY item:
 - [ ] Semantic HTML, keyboard accessible, labels linked
 - [ ] Strict TypeScript — no `any`, all params typed
 - [ ] All type-only imports use `import type` (especially after extracting hooks or moving files)
+- [ ] UI components have all states (hover, focus-visible, disabled, loading)
+- [ ] No hardcoded colors — theme tokens only. No inline styles for static values
+- [ ] No duplicated components — one canonical version in `components/ui/`
+- [ ] ui/ components in subfolders (not flat) when they have states/variants
 - [ ] `next/image` with `sizes`, `next/font` for fonts
 - [ ] `NEXT_PUBLIC_` only for client-visible env vars
 - [ ] Docker/CI updated if infrastructure exists
@@ -293,6 +299,13 @@ If you catch yourself thinking any of these, pause:
   → Simple structure IS the structure. `components/{domain}/` is simple.
 - "The existing code doesn't follow these patterns"
   → New code follows the rules. Suggest refactoring in review mode.
+- "This Button/Input only needs to render, I'll add states later"
+  → A component without hover, focus-visible, disabled, loading is incomplete. Add them now.
+- "I'll keep this inline, it's only used once"
+  → If it exceeds 30 lines or has its own state, extract to `components/`. If the same
+    pattern appears anywhere else, it MUST be a shared component.
+- "I'll use a hardcoded color here, the theme doesn't have this shade"
+  → Add the token to the theme. Never hardcode colors.
 - "I'll copy this import block from the original file"
   → Check every imported symbol: is it a runtime value (function, class, const) or a type
     (interface, type alias)? Always use `import type { X }` or `import { type X }` for types.
@@ -307,6 +320,12 @@ Use `references/review-checklist.md` for full audit. Key signals:
 - `useState` + `useEffect` for data fetching in Next.js
 - Missing `error.tsx` or `<Suspense>` boundaries
 - `any` types, `dangerouslySetInnerHTML` with user input, hardcoded secrets
+- UI components without states (no hover, focus-visible, disabled, loading)
+- Hardcoded colors (`bg-[#...]`) instead of theme tokens
+- Inline styles (`style={{}}`) for static values
+- Duplicated component implementations (2+ Buttons/Inputs across project)
+- Inputs without `<label>`, forms without error states, selects without keyboard support
+- Inconsistent spacing, colors, or patterns across pages
 - `baseUrl` in tsconfig.json (deprecated TS 6.0 — remove and use relative `paths`)
 - Auth only in middleware — middleware is NOT a security boundary (CVE-2025-29927)
 - Server Actions without auth checks — they are public HTTP endpoints, callable directly
