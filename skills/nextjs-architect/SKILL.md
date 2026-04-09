@@ -88,6 +88,9 @@ If `.github/workflows/` exists → `references/cicd-pipeline.md`.
 
 **Env vars:** `NEXT_PUBLIC_*` for client-visible only. Validate with Zod. Never commit `.env.local`.
 
+**New project?** Follow `references/project-bootstrap.md` for step-by-step setup
+(TypeScript, ESLint, Prettier, Husky, security headers, env, testing, Sentry, CI).
+
 **tsconfig.json:** If `baseUrl` is present — remove it (deprecated, will be removed in a future TS version).
 Use `paths` with relative prefixes instead: `"@/*": ["./src/*"]`. No `baseUrl` needed since TS 4.1.
 
@@ -425,4 +428,4 @@ All other components use **named exports**.
 
 > **Skill architecture note:** Domain-specific Reference skills require detection logic,
 > architecture rules, and version-specific guidance in the core — these cannot be deferred
-> to references without breaking the phased workflow. Core: ~1,700 words. References: 14 files.
+> to references without breaking the phased workflow. Core: ~1,800 words. References: 20 files.
