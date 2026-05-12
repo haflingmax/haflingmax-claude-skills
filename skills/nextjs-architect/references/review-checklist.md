@@ -9,6 +9,44 @@ When asked to review or audit a project, check EVERY category below and report f
 
 ---
 
+## Step 0 — Type Safety Census (MANDATORY, RUN FIRST)
+
+Before reading a single file for architectural critique, run the verification commands
+and report the baseline. Architectural review on top of a broken type graph is gardening
+a burning building.
+
+```bash
+# Type errors
+npx tsc --noEmit 2>&1 | tee /tmp/tsc-report.txt
+grep -c "error TS" /tmp/tsc-report.txt
+
+# Lint
+npx eslint . --max-warnings 0 2>&1 | tee /tmp/eslint-report.txt
+
+# Tests (if present)
+npx vitest run --reporter=verbose 2>&1 | tail -50
+```
+
+Report at the very top of your audit, BEFORE any other findings:
+
+```markdown
+## Type Safety Status
+- tsc errors: N across M files
+- Top error codes: TS2322 (X), TS1484 (Y), TS2741 (Z)
+- File hotspots: src/components/Foo.tsx (12), ...
+- ESLint problems: X errors, Y warnings
+- Tests: passing/failing/missing
+```
+
+Rules:
+
+- If `Found 0 errors` — note it and continue to architectural review.
+- If errors exist — they are the **#1 finding**. Flag the count and top hotspots first.
+- Do NOT silently filter out TS errors because "they look pre-existing". Report the baseline.
+- Use the per-error fix patterns from `references/type-safety-gate.md` to triage.
+
+---
+
 ## Architecture
 - Feature-based organization or anti-pattern (grouped by type)?
 - `app/` thin or bloated with logic?

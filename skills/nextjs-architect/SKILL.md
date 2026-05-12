@@ -274,15 +274,41 @@ export default function Page() {
 - i18n → `references/i18n.md`
 - Semantic variants → `references/semantic-variants.md`
 
-**Gate:** You cannot proceed to Phase 4 without: component implemented, test written, story created (if Storybook).
-**Review:** Re-read the code you just wrote. Check: `import type` for types, no `any`,
-no business logic in `app/`, correct `"use client"` boundaries. Fix issues before Phase 4.
+**Gate:** You cannot proceed to Phase 4 without: component implemented, test written
+(if applicable), story created (if Storybook), **AND `npx tsc --noEmit` shows
+`Found 0 errors` for the changed files** (Tier 1 — see TypeScript Verification Gate).
+**Review:** After EVERY file you write or modify, run `npx tsc --noEmit`. Catch errors
+while context is fresh — do NOT batch type-checking to the end. Visual review
+(`import type` for types, no `any`, `"use client"` boundaries, no business logic in `app/`)
+happens AFTER tsc passes. If `tsc` shows errors, fix them before writing the next file.
 
 ### Phase 4: Verification
 
-Before claiming work is complete, verify EVERY item:
+#### Step 0 — Type Safety Gate (MANDATORY — RUN BEFORE EVERYTHING ELSE)
 
-- [ ] Phase 1 complete — project context detected
+**You cannot start the visual checklist until you have RUN these commands fresh in this turn
+and quoted their output.** Visual items are easy to tick from memory; the compiler is not.
+
+- [ ] **RUN `npx tsc --noEmit`** — output MUST end with `Found 0 errors`.
+      Quote the final line verbatim. If `Found N errors in M files` — fix every error,
+      re-run, repeat until 0. Not "looks fine". Not "should pass". `Found 0 errors`.
+- [ ] **RUN `npx eslint <changed-paths> --max-warnings 0`** — exit code MUST be 0.
+      If lint config uses a different command (`npm run lint`), use it. Warnings are errors.
+- [ ] **RUN `npx vitest run <changed-paths>`** (if test files exist for affected paths) —
+      output MUST show `X passed, 0 failed`. If you wrote a new test, run it.
+- [ ] **RUN `npm run build`** (or `vite build`) — exit 0. **REQUIRED before commit/PR**,
+      may be deferred for in-progress iterations but NEVER for completion claim.
+      esbuild/swc catch errors `tsc` misses (e.g. value-typed imports under
+      `verbatimModuleSyntax`).
+
+If any command was not run in this turn, you have not completed Step 0.
+Skipping Step 0 because "the change is small" / "I'm confident" / "user is in a hurry" is
+the exact rationalization the TypeScript Verification Gate section below forbids.
+See `references/type-safety-gate.md` for the per-tool playbook and reading-output guide.
+
+#### Step 1 — Visual Checklist (only after Step 0 is GREEN)
+
+- [ ] Phase 1 complete — project context detected (files read, not just user-described)
 - [ ] Phase 2 complete — correct folder identified (not dumped flat, not in `app/`)
 - [ ] Server Component by default — `"use client"` only with justification
 - [ ] Logic/view separated if component has >1 useState or any useEffect
@@ -292,8 +318,8 @@ Before claiming work is complete, verify EVERY item:
 - [ ] `error.tsx` in route segments that fetch data or have async Server Components
 - [ ] `<Suspense>` with skeleton fallback around async content
 - [ ] Semantic HTML, keyboard accessible, labels linked
-- [ ] Strict TypeScript — no `any`, all params typed
-- [ ] All type-only imports use `import type` (especially after extracting hooks or moving files)
+- [ ] Strict TypeScript — no `any`, all params typed (verified by Step 0, not by eye)
+- [ ] All type-only imports use `import type` (verified by Step 0 under `verbatimModuleSyntax`)
 - [ ] UI components have all states (hover, focus-visible, disabled, loading)
 - [ ] No hardcoded colors — theme tokens only. No inline styles for static values
 - [ ] No duplicated components — one canonical version in `components/ui/`
@@ -306,7 +332,113 @@ Before claiming work is complete, verify EVERY item:
 - [ ] Import order: React → external → @/ → relative → types
 - [ ] Docker/CI updated if infrastructure exists
 
-**If any item fails, go back. Do not ship incomplete work.**
+**If Step 0 fails or any Step 1 item fails, go back. Do not ship incomplete work.**
+**Do not claim completion without Step 0 evidence quoted in this turn.**
+
+---
+
+## TypeScript Verification Gate
+
+This section is the contract that makes Phase 4 Step 0 binding. It specializes
+`superpowers:verification-before-completion` to the TS/React stack — that skill says
+"RUN, READ, VERIFY"; this section says **which** commands and **what** their output must show.
+
+### The Iron Law (TypeScript)
+
+```
+NO COMPLETION CLAIM WITHOUT FRESH TSC OUTPUT IN THIS TURN
+```
+
+If you have not run `tsc --noEmit` in the current message after your last code change,
+you cannot claim the work compiles, is type-safe, or is ready.
+Memory of a previous run does not count. "Tsc passed earlier" does not count.
+
+### Three Tiers
+
+| Tier | When | Commands | Why |
+|------|------|----------|-----|
+| **1 — Incremental** | After EVERY file written/modified | `npx tsc --noEmit` | Catches errors while you remember the change. Seconds with project references / watch. |
+| **2 — Completion (Phase 4 Step 0)** | Before ANY completion claim | `npx tsc --noEmit` + `npx eslint --max-warnings 0` + `npx vitest run` (if tests exist) | Proves the whole project compiles, lints, tests. |
+| **3 — Pre-commit / Pre-PR** | Before commit, push, or PR | `npm run build` (`next build` / `vite build`) | esbuild/swc differ from tsc — only build catches some classes of errors (value-typed imports under `verbatimModuleSyntax`, runtime type stripping, asset bundling). |
+
+**Tier 1 and Tier 2 are MANDATORY. Tier 3 is MANDATORY before commit/PR but may be deferred during iteration.**
+
+### The Gate Function
+
+Before saying "done", "готово", "ready", "passed", "complete", "shipped", or any synonym:
+
+1. **IDENTIFY** — which commands prove the claim?
+2. **RUN** — execute fresh, in this turn, in full (no partial paths unless the project supports project references)
+3. **READ** — full output, exit code, error count
+4. **VERIFY** — does output confirm the claim?
+   - `tsc`: must end with `Found 0 errors.`
+   - `eslint`: must exit 0 (no warnings if `--max-warnings 0`)
+   - `vitest`: must show `X passed, 0 failed`
+   - `build`: must exit 0
+5. **QUOTE** — include the relevant output line in your reply
+6. **ONLY THEN** — claim completion
+
+Skip any step → you are lying, not verifying. Even if the work is actually correct, claiming completion without evidence is the violation.
+
+### Claim → Evidence Map
+
+| Claim | Required evidence (this turn) | Not sufficient |
+|-------|-------------------------------|----------------|
+| "no `any` types" | `tsc --noEmit` → `Found 0 errors` (with `noImplicitAny`) | Visual scan; "I didn't write `any`" |
+| "imports are correct" | `tsc --noEmit` (with `verbatimModuleSyntax: true`) | "I used `import type` where I remembered" |
+| "props match upstream component" | `tsc --noEmit` against the consumer file | "I read the upstream file" (or worse — assumed) |
+| "no unused vars" | `eslint` → exit 0 | Visual scan |
+| "tests pass" | `vitest run <path>` → `X passed, 0 failed` | "I wrote tests" / "the test file exists" |
+| "builds in production" | `next build` / `vite build` → exit 0 | "tsc passed" |
+| "Phase 4 complete" | Tier 2 ran fresh, output quoted | Visual checklist ticked from memory |
+| "Feature ready for demo" | Tier 2 + Tier 3 both passed | Anything less |
+
+### Reading the Output Correctly
+
+- `Found 0 errors.` (with period) → pass
+- `Found N errors in M files.` → fail. Fix every one. ANY `error TS` line in output = fail, regardless of summary.
+- Exit code: `tsc` returns 0 on success, non-zero on errors. Use `echo $?` (bash) or `$LASTEXITCODE` (PowerShell) when unsure.
+- Build tools sometimes succeed despite warnings — treat warnings as errors in CI/PR claims.
+- "0 errors" in a SUBSET of the project does not prove the WHOLE project compiles. If you ran tsc on a subpath, the global claim still requires a full-project run.
+
+### Rationalization Prevention (TS-specific)
+
+| Excuse | Reality |
+|--------|---------|
+| "`verification-before-completion` didn't say which commands" | This section does. Run them. |
+| "This change is one file, tsc is overkill" | Incremental `tsc --noEmit` is seconds. Run it. |
+| "I read the upstream file, I know the props" | Read ≠ verify. `tsc` proves the binding. |
+| "tsc passed earlier in this session" | Today's edits need today's run. Now. |
+| "esbuild will catch it at build time" | Build is Tier 3. You are at Tier 1-2. Run tsc NOW. |
+| "I'm just iterating, will check at the end" | Errors compound. Run after EVERY file. |
+| "User is in a hurry / demo in 10 minutes" | False "done" is slower than a 3-second tsc. |
+| "The test file exists, that's enough" | Existence ≠ passing. Run `vitest run`. |
+| "I fixed the obvious errors, the rest look harmless" | Fix all. Re-run. Repeat until `Found 0 errors`. |
+| "tsc errors are just warnings really" | They are errors. Zero means zero. |
+| "It works in dev mode" | Dev mode skips type-checking. Tier 1-3 commands are the truth. |
+
+### Review-Mode Variant (auditing existing code)
+
+When asked to review/audit a project, BEFORE any architectural analysis:
+
+1. Run `npx tsc --noEmit` and capture the **full** error list.
+2. Group errors by file and category.
+3. Report counts at the top of your review: "Found N errors in M files: [breakdown]".
+4. Architectural review follows TYPE-error triage. Don't bury TS errors under style critique.
+
+See `references/review-checklist.md` for the full review-mode workflow.
+
+### Red Flags — STOP
+
+- About to say "готово" / "done" / "ready" / "passes" without having JUST run `tsc`
+- Writing the next file while the previous file's `tsc` errors are unresolved
+- Trusting an import because you read the upstream file
+- Skipping `tsc` because "this change is tiny"
+- Running `tsc`, seeing errors, fixing some, claiming done without re-running
+- Stating "no `any`" without a `tsc` run to prove it
+- Pasting code into the answer without running it through `tsc`
+
+All of these mean: **STOP. Run `tsc --noEmit`. Quote its output. Then continue.**
 
 ---
 
@@ -385,6 +517,10 @@ Use `references/review-checklist.md` for full audit. Key signals:
 | "This is just a prototype" | Prototypes become production. Build it right or don't build it. |
 | "The user said keep it simple" | Simple ≠ unstructured. These rules ARE the simple path. |
 | "Server Components can't do X, I need `use client`" | Composition pattern. Push `use client` to the leaf. Read Phase 3. |
+| "I'll skip `tsc` for this one file" | No. `tsc --noEmit` after EVERY file. Tier 1 of Type Safety Gate. |
+| "verification-before-completion is abstract — I'll do my own check" | The Type Safety Gate section specializes it. Run those exact commands. |
+| "I read the imported file, the props are correct" | Read ≠ verify. Run `tsc`. It's seconds. |
+| "User said urgent, no time for tsc" | A 3-second `tsc` is faster than shipping a broken type and rolling back. |
 
 ---
 
