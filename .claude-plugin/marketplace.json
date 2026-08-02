@@ -13,6 +13,11 @@
       "skills": [
         "./skills/nextjs-architect"
       ]
+    },
+    {
+      "name": "model-from-reference",
+      "description": "Discipline for building 3D models that must match 2D reference art: the six-beat step cycle, three-look inspection with mandatory top view and orbit, and the law that the eye judges form while measurement only guards proportion",
+      "source": "./plugins/model-from-reference"
     }
   ]
 }

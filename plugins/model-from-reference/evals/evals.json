@@ -1,0 +1,45 @@
+{
+  "skill_name": "model-from-reference",
+  "note": "Outputs are advice, not artefacts, so the assertions check for the presence of specific reasoning the skill exists to install — not for a file format.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "matches-numbers-looks-wrong",
+      "prompt": "Модель торса сходится с артом и по фасу, и по профилю — везде в пределах 5 мм при допуске 8. А выглядит всё равно не так, и я не могу понять почему. Что смотреть?",
+      "expected_output": "Should say that measurement is blind to form (a bounding box is the same for an oval and a rounded rectangle), and send the user to the view from above and an orbit — the two views orthographic projections cannot replace. Should not propose taking more measurements.",
+      "assertions": [
+        "Names the view from above as the thing to look at, and says why: a section's shape is invisible from every other angle",
+        "Names an orbit or rotation as necessary, and says why: ridges standing edge-on to the orthographic cameras are invisible in them",
+        "States explicitly that agreeing measurements cannot rule out a form defect, rather than suggesting more or finer measurements",
+        "Does not propose fixing anything before looking"
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "blockout-setup-from-turnaround",
+      "prompt": "Starting a character torso from a three-view turnaround for a game — roughly 3k triangles for this part. I've got the reference images and Blender open. How should I set this up before I touch geometry?",
+      "expected_output": "Should derive the budget from purpose and reference rather than accepting 3k uncritically, set up the scene and reference planes, produce markup as a control instrument rather than a blueprint to build from, and say plainly that the build itself is located by eye on the reference — not by a table of sections.",
+      "assertions": [
+        "Treats the polygon budget as something derived from purpose and the reference, not as a given number to fill",
+        "Covers scene setup and reference placement before any geometry",
+        "States that markup is used for checking, and that operations are located by eye on the reference rather than by a table of numbers",
+        "Does not hand back a table of cross-sections to model to"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "armhole-without-pole-ring",
+      "prompt": "I need to attach an arm to a torso mesh in Blender. The concept art has a sleeve seam I was going to cut along, but last time I did that I ended up with a pole at almost every step around the opening. How do I cut it this time?",
+      "expected_output": "Should say the opening is cut along the mesh's own lines — a rectangle in (ring, column) coordinates — not along the drawn seam, because a diagonal cut across the grid makes a staircase and every step becomes a pole. Should note that the seam is decoration and belongs in texture or a shallow groove, not in topology.",
+      "assertions": [
+        "Says to cut along the mesh's own ring and column lines rather than along the drawn seam",
+        "Explains that a diagonal cut across the grid produces a staircase and a pole per step",
+        "States the expected result: a grid-aligned opening yields exactly four poles, at the corners",
+        "Says the drawn seam belongs in texture or a shallow groove rather than in topology"
+      ],
+      "files": []
+    }
+  ]
+}
