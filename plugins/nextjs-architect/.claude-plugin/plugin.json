@@ -1,0 +1,17 @@
+{
+  "name": "nextjs-architect",
+  "description": "Next.js and React architecture skill with industry-standard engineering patterns, phased workflow, and mandatory planning",
+  "version": "1.0.0",
+  "author": {
+    "name": "Alexander Shilov"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "architecture",
+    "server-components",
+    "typescript",
+    "storybook",
+    "testing"
+  ]
+}

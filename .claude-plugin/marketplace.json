@@ -8,11 +8,7 @@
     {
       "name": "nextjs-architect",
       "description": "Next.js and React architecture skill with industry-standard engineering patterns, phased workflow, and mandatory planning",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/nextjs-architect"
-      ]
+      "source": "./plugins/nextjs-architect"
     },
     {
       "name": "model-from-reference",

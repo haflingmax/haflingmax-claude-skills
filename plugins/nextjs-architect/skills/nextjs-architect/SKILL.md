@@ -564,4 +564,5 @@ All other components use **named exports**.
 
 > **Skill architecture note:** Domain-specific Reference skills require detection logic,
 > architecture rules, and version-specific guidance in the core — these cannot be deferred
-> to references without breaking the phased workflow. Core: ~1,800 words. References: 20 files.
+> to references without breaking the phased workflow. Core: ~4,500 words. References: 22 files,
+> ~20,000 words.
