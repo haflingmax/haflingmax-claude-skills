@@ -42,9 +42,9 @@ Two orthographic views are not enough. The set is:
 | **Orbit, six angles** | Ridges standing edge-on to the orthographic cameras are invisible in them |
 | Smooth shading | Volume, hollows, folds, flat facets |
 | Reflective / striped matcap | Continuity of curvature — shows breaks at zero positional error |
-| Silhouette fill | The outline alone. **Contour judgements are made on this channel only** — shading darkens the far side and the contour is lost exactly where it is being measured |
+| Silhouette fill | The outline alone. **The contour's shape is read on this channel only** — shading darkens the far side and the contour is lost exactly where it is being measured |
 | Cage over the smoothed result | For the flow and placement looks — **same angles as the surface pass, orbit included** |
-| **Model over the reference** | The working channel draws the reference behind the model; divergence of contours reads here and nowhere else |
+| **Model over the reference** | The working channel draws the reference behind the model; whether the contour *matches the art* reads here and nowhere else. Shape on the silhouette, agreement on the overlay — two questions, one channel each |
 | Close-ups of the zone | A defect a fraction of a millimetre deep is invisible in a wide shot |
 
 **Hide the guides before shooting the cage.** A guide plane crossing the frame covers the ring line
@@ -90,7 +90,8 @@ Each gets:
 1. **The reference itself** — the image files, and the zone crops. Not a paraphrase of them.
 2. **The frames for its channels**, and the frame scale with how to convert a pixel row to
    millimetres.
-3. **The tolerance and what is measured against it.**
+3. **The form tolerance and what is measured against it** — the one assigned at M2, never the
+   measurement tolerance (see references §7).
 4. **An explicit instruction to judge against this reference, not against general knowledge of the
    object.** Verified on the very first review ever run: an agent reported that the widest part of
    a head should sit a third of the way down — true of a typical skull, false of the mannequin
@@ -132,7 +133,7 @@ why, and the decision.
 The step closes when **all** of these hold — the fix loop has closed, meaning none of the three
 looks names a defect in the affected zone; the form has been taken as far as this density allows;
 the operation's own check has passed; and any remaining divergence from the measurement is either
-inside the form tolerance set at M2 — not the measurement tolerance — or explained by density and
+inside the form tolerance assigned at M2 (measure-vs-eye §7) — not the measurement tolerance — or explained by density and
 written into the journal with its number.
 
 A fix after a bad inspection leads to a new inspection, not to the next operation — even when the

@@ -38,7 +38,7 @@ files other than the images you are given.
 - **The cage over the smoothed result**, **smooth shading**, the **reflective channel**, and an
   **orbit** — including the view from above.
 - **The frame scale**: millimetres per pixel and the height of the frame's top edge.
-- **The tolerance** for this part and what is measured against it — otherwise "the vertices are far
+- **The form tolerance** for this part — assigned at M2, the one the model is held to — and what is measured against it — otherwise "the vertices are far
   apart here" turns out to be two millimetres.
 
 **Judge against this reference, not against general knowledge of the object.** The target is the

@@ -163,16 +163,18 @@ Create the **step's rollback point** (§13), then perform exactly one topologica
 
 **The unit of shaping is the ring, not the mesh.** Vertices are placed one ring at a time, from the
 top down: each vertex of the ring is assigned its own place, rather than a common law of
-displacement. After a ring — an inspection (beat 4 in miniature: from above, from the side, by
-orbit). Move on **only if the correction is right**; if it is not, the ring is placed again from
+displacement. After a ring — an inspection (beat 4 in miniature, and over the same four mandatory viewpoints:
+from the front, from the side, from above, by orbit — see [phases.md](phases.md), §11.1). Move on **only if the correction is right**; if it is not, the ring is placed again from
 scratch.
 
 **A batch formula over the whole mesh is forbidden** (A15). Scale, projection, a per-height
 correction factor — all of these deform form that already exists without creating new form: scaling
 will not get you an oval out of a square, and the bounding measurements will agree all the same,
-because a square and an oval have the same width and depth. A formula is admissible only where it
-is itself the goal of the operation — a uniform thickening, say — and never as a way to "give it
-form".
+because a square and an oval have the same width and depth. A formula is admissible in two cases only, and neither of them is giving form: where the formula
+**is** the goal of the operation — a uniform thickening, say — and where it **inverts a transform
+whose effect is known exactly**, putting the cage where the limit surface lands on a target the eye
+already placed (see [measure-vs-eye.md](measure-vs-eye.md), §5.11a and §6). Never as a way to "give
+it form".
 
 Move the vertices only of the geometry **whose composition beat 2's operation changed**:
 
@@ -249,7 +251,8 @@ oval and the other is a box. The top view had never been taken, because the numb
 
 | Pass | What it looks at | With what |
 |------|------------------|-----------|
-| **Surface** | the form: **does the contour run as one continuous arc**, is there a break, a straight insert, bulges, hollows; does it sit on the reference | smooth shading, the reflective channel, silhouette fill |
+| **Surface** | the form: **does the contour run as one continuous arc**, is there a break, a straight insert, bulges, hollows; does it sit on the reference | smooth shading, the reflective channel, silhouette fill, and — for agreement with the art rather
+than the shape of the contour itself — the model drawn over the reference |
 | **Mesh** | how the form is made: edge flow, vertex distribution, poles, the seam | the wireframe over the smoothed result |
 
 **The eye judges the form. Measurement is a coarse guard of proportions, and nothing more.**

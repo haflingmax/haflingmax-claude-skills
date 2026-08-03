@@ -38,7 +38,7 @@ than the images you are given.
 - **The cage drawn over the smoothed result**, from several angles including **the view from above**
   and **an orbit** — the same angles as the surface pass — plus smooth-shaded frames for comparison.
 - **The frame scale**: millimetres per pixel and the height of the frame's top edge.
-- **The tolerance** for this part and what is measured against it.
+- **The form tolerance** for this part — assigned at M2 — and what is measured against it.
 
 **Judge against this reference, not against a generic anatomy chart.** Flow serves the form this
 reference shows. An inspector who judges against the typical version of the object produces findings

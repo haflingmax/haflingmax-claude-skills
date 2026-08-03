@@ -39,7 +39,7 @@ images you are given.
   channels.
 - **The frame scale**: millimetres per pixel and the height of the frame's top edge, so you can
   convert a pixel row to a height in millimetres.
-- **The tolerance** for this part and what is measured against it — so that "far too wide" does not
+- **The form tolerance** for this part — assigned at M2 — and what is measured against it — so that "far too wide" does not
   turn out to be two millimetres.
 
 **Judge against this reference, not against general knowledge of the object.** The target is the
@@ -57,12 +57,14 @@ object.
   gently bending stripes. A break shows as a sharp kink in the stripes; a dent as local crowding; a
   singular point as a star or vortex the stripes run into. This channel shows defects at zero
   positional error, which is why it exists.
-- **Silhouette fill** — the outline alone. **Judge the contour on this channel and no other.** In
+- **Silhouette fill** — the outline alone. **Read the contour's *shape* on this channel and no other.** In
   the shading channel the far side converges in brightness with the background and the outline
   disappears exactly where you would be measuring it; describing that boundary produces findings
   like "a flat cap" or "a chamfer on the slope" where the light simply ran out.
-- **Model over the reference** — divergence of contours against the art, readable here and nowhere
-  else.
+- **Model over the reference** — whether that contour *matches the art*, readable here and nowhere
+  else. The two questions split cleanly and each has exactly one channel: the silhouette says what
+  the contour is, the overlay says what it should have been. Asking either on the other's channel is
+  the mistake.
 
 Two properties of the renderer, so you do not report them as defects: the light is attached to the
 camera, so **mirrored orbit angles differ in shading** — that is normal, and asymmetry is judged on

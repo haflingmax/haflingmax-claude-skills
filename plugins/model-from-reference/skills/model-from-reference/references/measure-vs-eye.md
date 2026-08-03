@@ -35,10 +35,11 @@ form, a drawn line, the point where width stops growing, the start of a surface 
 
 ### 5.2 How a divergence is fixed
 
-A divergence larger than the measurement tolerance (see [work-rules.md](work-rules.md), R6, item 8)
-is fixed by **moving already existing vertices across the form, without carrying them along it**.
+A divergence larger than the **form tolerance** (§7 — the one assigned at M2, not the measurement
+tolerance the reference was read with) is fixed by **moving already existing vertices across the
+form, without carrying them along it**.
 
-Carrying geometry along the form in order to land inside tolerance is forbidden on exactly the same
+Carrying geometry along the form in order to land inside the form tolerance is forbidden on exactly the same
 footing as adding new geometry at the measured height: if the bounding measurement only agrees after
 such a move, what is wrong is not the geometry but the form between the things already built, and
 that means rolling back to the step that built the zone.
@@ -335,7 +336,11 @@ at once.
 rings —
 rings corrected through each other, pass after pass, with nobody looking in between. A sweep is a
 direct solve: the system is written once from targets already taken off the reference, solved in one
-pass, and the result is inspected before anything else happens. It is also on the legitimate side
+pass, and the result is inspected before anything else happens. What still bounds it is the
+**step's own scope** (see [step-cycle.md](step-cycle.md), §4, beat 3): the chain solved is the
+geometry this operation changed plus its immediate neighbours. Seven rings were legitimate because
+the operation had created all seven — not because a solve may reach anywhere. It is also on the
+legitimate side
 of §6: the targets come from the reference, and the sweep only inverts the subdivision stencil — a
 transform whose effect is known exactly. It originates no form. The sign the ban turns on — "more
 than four rings in one convergence loop" — is a sign of groping, not of arithmetic. Solving seven
@@ -386,9 +391,11 @@ worse: a convergence loop seeded from the current mesh with the same defect blew
 40 mm radius to 245 mm — the topology stayed clean the whole time, so no counter registered
 anything, and the damage was found by eye on a render.
 
-**Rule:** the semi-axis of a section comes from the **markup**, never from the ring in front of
-you. If a ring is partial, its own extent describes the hole, and the only honest source for the
-section it belongs to is the level measurement.
+**Rule:** when a section's semi-axis is needed **as a number to compare against**, it comes from the
+**markup**, never from the ring in front of you. If a ring is partial, its own extent describes the
+hole, not the section, and the only honest source for the section is the level measurement. This is
+a rule about where a *verification* number is read from — it does not licence placing the ring from
+that number; where the ring goes is still found by eye on the reference (§6).
 
 **Violated if:** `max()` over a ring's own vertices appears in a formula that re-places those
 vertices; if a re-seating operation changes a hole's boundary that no operation asked to move.
@@ -480,7 +487,7 @@ taken at M2 and written into the task.
 | Decision | Why up front and not as you go |
 |----------|--------------------------------|
 | Assembly order and its justification | There is no single canonical order; the choice is justified by which zone of the part is the riskiest — that zone is built while the mesh is still cheapest to redo |
-| **Delivery form** | What goes out — the cage, or baked subdivision, and at which level. The hard-edge policy, the density at which form is judged, and which mesh the polygon count is taken from all depend on it |
+| **Delivery form** | What goes out — the cage, or baked subdivision, and at which level. The hard-edge policy and the density at which form is judged depend on it. What does **not** depend on it is which mesh the polygon count comes off: that is always the result of the transforms, never the cage, in both branches ([phases.md](phases.md), M6) |
 | **Subdivision level L** | Follows from the delivery form. It is also the factor that converts cage segments into faces on the final surface when N is checked **after** the build — not a licence to convert in advance and assign the cage a count — and the ring forecast depends on it |
 | **The girth requirement on the final surface** | Not a cage number but an acceptance criterion: at the most demanding section the final surface must carry no fewer than N faces around its girth, where N comes from the calculation in [work-rules.md](work-rules.md), R6, item 11. How many segments the cage ends up with, and when they appear, is a result of the work (§8) |
 | **The parity rule at the seam** | Any closed ring crossing the plane of symmetry must have an even number of segments: with an odd number it has no vertices on the plane itself — the seam runs through the middle of a face, the halves do not meet vertex to vertex, and the edge flow is skewed. This is a constraint **on operations**, not a number assigned in advance: a cut that produces an odd ring at the seam is forbidden |

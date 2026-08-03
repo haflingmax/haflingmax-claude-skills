@@ -102,7 +102,8 @@ created here.
 
 **Done when:** stray objects have been removed; the axis is aligned and the placement re-confirmed
 under R5; the zero point is set; guides are built one per measurement and overlaid on the reference
-without divergence; mirroring is set up; the transform properties are recorded, including the
+without divergence; mirroring is set up — or, where the editor cannot configure it before geometry
+exists, the report records the means and names the moment it will be engaged; the transform properties are recorded, including the
 equality of the viewport and render subdivision levels; the report is published and confirmed.
 Subdivision is **not** engaged here — its level is assigned at M2 and engaged at M3.
 **Violated if:** something was deleted without presenting a list; the axis was aligned by moving the
@@ -147,6 +148,11 @@ geometry that lands in the count; building started without confirmation of the r
    from the calculation in R6, item 11. This is an acceptance criterion, verified by gauging the
    finished surface, and **not** a segment count assigned to the cage: segments arise from cuts, and cuts are
    not assigned in advance (see [measure-vs-eye.md](measure-vs-eye.md), §8).
+   Assign the **form tolerance** in the same item: how far the model is entitled to diverge from the
+   reference (see [measure-vs-eye.md](measure-vs-eye.md), §7). It is **wider** than the measurement
+   tolerance R6 item 8 declares, and it is the tolerance every later gate and every step closure
+   compares against; the measurement tolerance never closes anything. Assigning it here is what
+   makes those gates checkable — without it they cite a decision nobody took.
 4. **Estimate the polygon count — as a forecast, not as a quota.** The estimate is needed only to
    check the budget and is given as **one number per part**.
    It must be computed **from surface area and the required face size**, not by decomposing the mesh
@@ -177,7 +183,7 @@ zone has been left without an assigned method of construction; all policies are 
 boundaries and limits are named.
 
 **Done when:** zones are marked out by form features, the delivery form and the level L that
-follows from it are recorded, policies are assigned, the forecast fits the range, stage boundaries
+follows from it are recorded, the form tolerance is assigned, policies are assigned, the forecast fits the range, stage boundaries
 and limits are named, the plan is approved.
 **Violated if:** the function-of-height check was not performed; the delivery form was left
 undecided while L was assigned anyway; the plan assigns a cage segment
@@ -186,7 +192,7 @@ ring heights or section bounding measurements have appeared in the plan **in any
 name** — forecast, reference figure, zone boundaries, guideline.
 The only numbers admissible in the plan: the part boundaries, the part's overall bounding
 measurement, the required number of faces around the girth at the most demanding section (N), the
-subdivision level L, the bounds of the polygon range, the one-number-per-part polygon forecast of
+subdivision level L, the form tolerance, the bounds of the polygon range, the one-number-per-part polygon forecast of
 item 4, and a total ring forecast not tied to heights.
 
 ### M3 — Blockout: volumes
@@ -200,7 +206,8 @@ The phase constitutes one stage.
 
 **Done when:** subdivision has been engaged at the level L assigned at M2, with the viewport level
 equal to the render level; zero open edges; all the large volumes are in place; the part is
-recognisable from a silhouette fill alone; the overall bounding measurement is in tolerance; the
+recognisable from a silhouette fill alone; the overall bounding measurement is within the **form
+tolerance** assigned at M2; the
 transforms are not baked; the stage has been accepted by the human.
 **Violated if:** one region was taken to a finish while the rest lagged behind; the transforms were
 baked; the actual polygon count is outside the R2 range; the blockout was run by markup blocks.
@@ -253,32 +260,41 @@ edge flow across the boundary; whether the parts are welded into a single mesh o
 accepted part's contract is a mandatory input to the neighbour's M2.
 
 **The joint check** is performed at the M5 of the second part of the pair: the end caps' bounding
-measurements agree within the measurement tolerance; the cage segment counts agree; there is neither a
+measurements agree within the measurement tolerance — the tight one, deliberately: two built caps
+have to *meet*, and holding them only to the form tolerance would let each drift its own way and
+still leave a gap; the cage segment counts agree; there is neither a
 gap nor interpenetration in three views.
 **Failure branch:** what gets fixed is the part being built now, not the one already accepted; if it
 cannot be fixed, the accepted part is reopened by an explicit decision of the human.
 
 **Decisions the human may take** when a divergence is presented: accept the divergence, entering the
 measurement into the excluded list; order a rollback to the stage that built the zone plus a new
-pass; change the tolerance, with a re-check of all previously accepted zones. Silence is not
+pass; change the **form** tolerance — never the measurement tolerance, which is a property of the
+reference and not a dial — with a re-check of all previously accepted zones. Silence is not
 acceptance.
 
-**Done when:** the full verification has been performed; every divergence is either within
-tolerance, or disputed per [measure-vs-eye.md](measure-vs-eye.md), §5.4, or accepted by the human;
+**Done when:** the girth requirement N has been checked — the final surface gauged at the most
+demanding section carries no fewer than N faces around its girth (M2, item 3), the count taken off
+the subdivided result and not off the cage; the full verification has been performed; every
+divergence is either within
+the **form tolerance**, or disputed per [measure-vs-eye.md](measure-vs-eye.md), §5.4, or accepted
+by the human;
 the joint contract is published; for the second part of a pair, the joint check has passed.
 **Violated if:** the repair pass limit was exhausted without presenting it to the human; a
 divergence was quietly fudged away; a part was accepted without publishing the contract.
 
 ### M6 — Saving and delivery
 
-A rollback point is created at **every accepted stage**, not only at the end of the phase. The
+A rollback point is created at **every accepted stage**, not only at the end of M6. The
 point's name names the stage.
 
 **What leaves the phase — in the delivery form decided at M2** (see
 [measure-vs-eye.md](measure-vs-eye.md), §7):
 
 - **if the delivery form is the cage** — the part as a cage, transforms engaged but not baked;
-- **if the delivery form is baked subdivision** — baked here, at level L, and not before: baking
+- **if the delivery form is baked subdivision** — both transforms are applied here, mirroring first
+  so that the halves are one shell before the surface is frozen, then subdivision at level L, and
+  not before: baking
   earlier takes away the ability to re-shape the proportions in one movement (§16.A). Baking is one
   of the two ways to make edge creases usable; the other is an interchange format that carries
   creases itself (see [measure-vs-eye.md](measure-vs-eye.md), §7). Creases are unfit only in the
@@ -303,8 +319,8 @@ before this phase.
 
 | Operation | When it is used | Check afterwards | What it is not |
 |-----------|-----------------|------------------|----------------|
-| **Set up mirroring** (M1) | Before any geometry, as the first act of setup — not a step | Deferred: there is no geometry to check at M1, so the check falls due at the first step that creates any. Then — the seam closes with no gap and no ridge; no seam vertex leaves the plane; there are no doubled vertices on the seam | Not a bake: mirroring lives to M6 and leaves engaged, unless the delivery form decided at M2 says otherwise. Beat 3 is not performed — no geometry is affected |
-| **Engage subdivision** (M3) | Together with the first volume, at the level L assigned at M2. Not at M1: L does not exist yet — M1 only records the principle and the checkable property that viewport level equals render level | The subdivided envelope, not the cage, sits inside the silhouette; viewport level equals render level and both equal L | Not a bake: from this moment every gauge is taken off the result. Beat 3 is not performed |
+| **Set up mirroring** (M1) | Before any geometry, as the first act of setup — not a step | Deferred: there is no geometry to check at M1, so the check falls due at the first step that creates any. Then — the seam closes with no gap and no ridge; no seam vertex leaves the plane; there are no doubled vertices on the seam | Not a bake: mirroring stays engaged through the whole build. It leaves engaged in the cage delivery form, and is applied at M6 — first, before subdivision — in the baked one. Beat 3 is not performed — no geometry is affected |
+| **Engage subdivision** (M3) | Together with the first volume, at the level L assigned at M2. Not at M1: L does not exist yet — M1 only records the principle and the checkable property that viewport level equals render level | Deferred in the same way as the row above: the level equality is readable the moment the modifier exists, but the envelope check falls due at the first step that creates geometry — which here is the same step. Then — the subdivided envelope, not the cage, sits inside the silhouette; viewport level equals render level and both equal L | Not a bake: from this moment every gauge is taken off the result. Beat 3 is not performed |
 | **Create the primary volume** | Once, at the start, in the riskiest zone of the part (§10.3) | If the volume spans the whole part, its bounding measurement follows the part's overall bounding measurement ([measure-vs-eye.md](measure-vs-eye.md), §5.3). If the volume occupies a single zone, its bounding measurement is **not given as a number at all**: the volume is placed against the reference's silhouette in both views and corrected by eye. A zone's local bounding measurement never enters the operation's brief under any circumstances. Check: the volume is inscribed in its zone's contour in both views and nowhere goes outside it | Not an attempt at likeness: the task is to occupy the right place |
 | **Cut the primary volume up to load-bearing density** | Once, immediately after the volume is created | Take it to the **minimum** density at which the zone carries its own large-scale curvature. The segment count is not assigned in advance: the criterion is the behaviour of the form, not a figure. Check: the subdivided envelope reads as a volume and not as a rounded box, **and** the density is the least of those at which that is so — removing one cut must spoil the form | Not stocking up on density for later |
 | **Continue the shell** | The form continues in a new direction. The place is found **by eye on the reference** — where the character of the form changes | The nearest measurement is the nearest in height within half the distance to the next measurement; the bounding measurement is gauged off the final surface **at the measurement's own height**, not at the ring's height. If there is no measurement in that window, beat 5 is skipped explicitly. The transition has no crease and no pinch on the subdivided surface | Not "continue to level N": the height is a result, not a brief |
@@ -399,7 +415,8 @@ It is not only the angle that has to change but the channel: one channel hides w
 
 | Channel | What it shows |
 |---------|---------------|
-| Silhouette fill | Whether the part reads from a single contour |
+| Silhouette fill | **The shape of the model's own contour.** Under shading the far side darkens and the contour is lost exactly where it is being read, so this is the channel the contour's *shape* is judged on |
+| **The model drawn over the reference** | **Whether that contour matches the art.** The silhouette shows what the contour is; only this channel shows what it should have been. The two questions are different, and each has exactly one channel — asking either of them on the other's channel is the mistake |
 | Smooth shading with a plain material | How the surface flows: tearing and bumps are visible only here |
 | **Reflective channel** (a mirror or striped material, an environment reflection) | **Continuity of curvature.** A diffuse grey material shows the position of the surface and hides its character: a curvature break with zero positional error is not visible on it at all. On a reflective one it reads immediately — the reflected stripe breaks where the curvature breaks. Without this channel "a clean arc" cannot be verified |
 | Wireframe over the smoothed result | What is being edited and what comes out of it — at the same time |
@@ -516,7 +533,7 @@ of height" check; the build zones; the stage boundaries; the limits; the polygon
 this part's share of the range; the rollback points.
 
 **Inherited as a contract from accepted neighbours:** the position of the boundary; the section's
-bounding measurement at the boundary; the number of segments at the joint; the direction of edge
+bounding measurement at the boundary; the number of **cage** segments at the joint; the direction of edge
 flow across the joint.
 
 The segment count changes only where the part does not join an already-accepted one. Changing the

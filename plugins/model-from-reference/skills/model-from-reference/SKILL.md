@@ -208,18 +208,20 @@ advance.
 Do not perform an operation whose location can be found from a table of measurements, a plan, a
 guide object, a zone or level number, or a fraction of the part's height. Rewrite the wording first.
 
-Do not run beat 4 with fewer than four viewpoints — front, side, top, orbit — and fewer than three
-surface channels — silhouette fill, smooth shading, and the reflective channel — plus the cage over
-the smoothed result and a close-up of the zone. The canonical sets live in phases.md §11.1 and
-§11.2. A contour is judged on the silhouette channel and on no other.
+Do not run beat 4 with fewer than four viewpoints — front, side, top, orbit — and fewer than four
+surface channels — silhouette fill, smooth shading, the reflective channel, and the model drawn over
+the reference — plus the cage over the smoothed result and a close-up of the zone. The canonical sets live in phases.md §11.1 and
+§11.2. A contour's shape is read on the silhouette channel and on no other; whether it matches the art is
+read on the model-over-reference overlay and on no other.
 
 Do not send a zone to inspection without the reference attached.
 
 Do not close a step on measurements, and do not close it on the inspection alone. All four must
 hold: the fix loop has closed, meaning none of the three looks names a defect in the affected zone;
 the form has been taken as far as this density allows; the operation's own check has passed; and any
-remaining divergence is either inside the form tolerance set at M2 — never the tighter measurement
-tolerance the reference was read with — or explained by density and written into
+remaining divergence is either inside the form tolerance assigned at M2 (measure-vs-eye.md §7) —
+never the tighter measurement tolerance the reference was read with — or explained by density and
+written into
 the journal with its number.
 
 Do not gauge off the cage. Take the reading from the final surface, with subdivision applied.
@@ -227,7 +229,9 @@ Do not gauge off the cage. Take the reading from the final surface, with subdivi
 Do not run a convergence *loop* over more than four rings, or over a height range spanning more than
 one form feature. This bans groping, not arithmetic: a closed-form solve — inverting the subdivision
 stencil for a chain of rings whose targets the eye has already placed — is not a loop and is not
-limited by ring count. Prefer it exactly because it does not iterate.
+limited by ring count. What still bounds it is the step's scope: the chain solved is the geometry
+this operation changed plus its immediate neighbours. Prefer a solve exactly because it does not
+iterate.
 
 Do not apply a formula — scale, projection, a per-height factor — over geometry the step's operation
 did not change, and never let a formula originate a form. A computation may undo a transform whose

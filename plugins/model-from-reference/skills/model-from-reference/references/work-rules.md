@@ -301,7 +301,8 @@ It is computed from the 2D reference, separately for each part:
    (A14).
 4. Additions: 2 edge loops per animated joint (C1); separate polygons for the elements from D3 that
    have to read.
-5. `min = Σ min_quads(parts) + closing caps`.
+5. `min = Σ min_quads(parts) + closing caps`. Counted in **faces on the final surface** — the same
+   unit as the floor in item 2 and as N — never in cage segments.
 
 **The minimum has to pass a visual check.** If the silhouette does not read at the minimum, the
 minimum is too low and the calculation is repeated. A number not confirmed by a picture is not a
@@ -394,6 +395,10 @@ at once, by eye".
    report.
 5. **Acceptance.** The user says "accepted" or gives corrections. Corrections are the same part, a
    new iteration. Without the word "accepted" the next part does not begin.
+
+**How to check.** The scene contains geometry for exactly one part that is not yet accepted; the
+journal carries the word "accepted" from the user for every earlier part in the agreed order; the
+decomposition list is the one agreed at the start, unchanged without an explicit decision.
 
 **Where part boundaries come from.** First of all — from the reference itself, if it defines them:
 the joint lines of an articulated mannequin, the seams of a costume, the divisions of armour, a
@@ -595,8 +600,9 @@ of a flat image is not obliged to coincide with the form a volume will give, and
 itself may be internally inconsistent (see the measured asymmetry). Hence:
 
 - the metrics hold the **proportions and the scale**; they do not dictate literal reproduction;
-- the tolerance describes the **precision of measuring the reference**, not a requirement on the
-  model: you may go outside it if the form reads better that way — but deliberately and out loud;
+- the **measurement** tolerance describes the **precision of measuring the reference**, not a
+  requirement on the model — how far the model may diverge is the *form* tolerance, assigned at M2
+  (see [measure-vs-eye.md](measure-vs-eye.md), §7): you may go outside it if the form reads better that way — but deliberately and out loud;
 - a divergence between the model and a metric is **grounds for discussion**, not an automatic
   defect;
 - the metrics must not be presented as a standard to be reproduced exactly: that would bring back
@@ -639,13 +645,21 @@ written.
    median of the silhouette's row centres (the median, not the mean: it is robust to rows where
    part of the mask has dropped out). Isolated outliers in the extreme rows are an artefact of the
    mask, not a skew.
-8. **Declare the tolerance.** A tolerance is not assigned by taste:
+8. **Declare the measurement tolerance.** It is not assigned by taste, and it is not the tolerance
+   the model is later held to — that is the form tolerance, assigned at M2:
    - for comparison against a **full bounding measurement** — twice the measurement error of the
      reference (1 px of the reference in mm × 2). Over the full width a shift of the axis cancels
      out;
    - for comparison against **one side** — the same plus the measured asymmetry from item 7. Such a
      comparison is inherently weaker and is used only when the full bounding measurement is
      unavailable.
+**A note on the word "segment".** In this rule it means a **drawn line on the markup picture** —
+the horizontal stroke of the measured length at a level. That is a different thing from a **cage
+segment**, an edge of a ring on the control cage, which is what "segments around the girth" always
+refers to. Neither is ever a face on the final surface: the requirement N and the R2 floor are
+counted in faces (item 11). Three words, three things; the context makes which one plain, but never
+convert between them silently.
+
 9. **Assemble the markup — that is the presentation.** Both views of the reference side by side on a
    common vertical scale; at each level a segment of exactly the measured length with ticks at its
    ends; the vertical height dimension of the part at the side; the numbers as labels on the
@@ -666,19 +680,20 @@ written.
       take a forecast of the ring count as one number per part, labelled "forecast, not a build
       order".
 12. Build the part, comparing its bounding measurements against those same segments. A divergence
-    larger than the tolerance is examined: either the model is fixed, or the divergence is accepted
+    larger than the **form** tolerance assigned at M2 is examined: either the model is fixed, or the divergence is accepted
     deliberately with an explanation. Leaving a divergence in silence is not allowed — but neither
     is blindly fitting to the number.
 13. The next part starts again from item 2. Measurements are not taken ahead of time.
 
 **How to check.** The markup contains: the part's height, the width and depth segments at every
-level of the range, the tolerance. After building — the same script takes the model's bounding
-measurements at the same levels and prints the deviation in millimetres and in tolerances.
+level of the range, the measurement tolerance. After building — the same script takes the model's bounding
+measurements at the same levels and prints the deviation in millimetres and against the **form**
+tolerance, which is the one that decides.
 
 **Done when:** the part's markup is assembled and approved by the user on the picture.
 **Violated if:** the whole figure was measured instead of the current part; a table of numbers was
 presented instead of markup; the levels were taken from general ideas about anatomy; the
-measurements were made with a cursor or by eye; the tolerance was assigned arbitrarily; a composite
+measurements were made with a cursor or by eye; the measurement tolerance was assigned arbitrarily; a composite
 silhouette width was passed off as a bounding measurement of the part; the part's height was not
 measured; width and depth were taken at different heights; a drawn boundary was assigned silently
 instead of being measured or agreed; **the metrics were presented as a standard to be reproduced
@@ -761,9 +776,9 @@ The checks are run by script, all at once, before any conclusions:
 
 | # | Check | Sign of trouble |
 |---|----------|--------------|
-| 1 | Completeness | no levels, heights, axis, scale or tolerance |
+| 1 | Completeness | no levels, heights, axis, scale or measurement tolerance |
 | 2 | The part's range | the declared range disagrees with the actual data |
-| 3 | Distance between levels | two levels closer than the tolerance — one of them is redundant |
+| 3 | Distance between levels | two levels closer than the measurement tolerance — one of them is redundant |
 | 4 | Dips in a bounding measurement | a middle level noticeably narrower than both neighbours over a small height |
 | 5 | Repeated bounding measurements | the same value on three levels in a row — it was not re-measured |
 | 6 | Coverage of the part | the union of the blocks leaves holes; check by union, not by sum — blocks may overlap |
@@ -990,10 +1005,10 @@ the queue is not a priority.
 | 2026-07-31 | The method's methodology was moved out of R8 into a separate document, the method regulation: the work-type rule is responsible for choosing the method, the method's document for how one works with that method. The sub-steps were renumbered 8.2–8.7 → M1–M6, since they no longer depend on a rule number. |
 | 2026-07-31 | Sub-step 8.2 "Setup" was described: inspecting the scene as a whole, aligning the markup axis with the mirror plane by shifting the reference, guides taken from the markup and not made as geometry, the "mirror before subdivision" stack with its parameters recorded before any mesh appears. |
 | 2026-07-31 | Seven build sub-steps along the box-modelling branch were written into R8, together with a section "What practice has confirmed" summarising the sources. As a result of the comparison, the topology plan was moved from fifth position to third — the direction of the loops is settled before the blockout, not after refinement; the blockout builds the part as a whole, and the markup blocks remain the unit of refinement; seam convergence is checked on the blockout. |
-| 2026-07-31 | R8 added — choosing the build method: box modelling or sculpting with retopology, both presented, the recommendation derived from the answers to the R2 questionnaire. Lofting through sections is excluded explicitly, with justification. Failure mode A13 added. The sub-step cycle was written into the README: studied → agreed → recorded → performed → checked. |
-| 2026-07-31 | Levels are grouped into vertical segments: a segment is a block of the part, and the levels that fall into it are its rings. Blocks may overlap (head and neck), so a level's membership is stated explicitly where its Z falls into two blocks, and coverage is checked by union rather than by the sum of lengths. |
+| 2026-07-31 | R8 added — choosing the build method: box modelling or sculpting with retopology, both presented, the recommendation derived from the answers to the R2 questionnaire. Lofting through sections is excluded explicitly, with justification. Failure mode A13 added. The sub-step cycle — studied → agreed → recorded → performed → checked — was written down; it now lives in [rule-process.md](rule-process.md). |
+| 2026-07-31 | Levels are grouped into vertical segments: a segment is a block of the part, and a level belongs to the block whose height range contains it. Levels are places of comparison, never the model's rings. Blocks may overlap (head and neck), so a level's membership is stated explicitly where its Z falls into two blocks, and coverage is checked by union rather than by the sum of lengths. |
 | 2026-07-31 | R7 added — markup: what to start up, what to ask, what to check, how to accept. Eight checks on the returned markup, the division of findings into observations and probable errors, and the prohibitions on acting during someone else's work. Failure modes A11 (markup instead of the author) and A12 (destroying someone else's result) added. |
-| 2026-07-31 | R6 applied to the first part in full. Added: a label is mandatory for gauges of internal features of the form (otherwise they are indistinguishable from a miss — a chin 36.9 mm wide against a silhouette of 100.3 looked like a defect); a section is treated as an ellipse with an integral around the perimeter rather than a single radius; gauges of internal features are excluded from the section calculation; the ring count is taken from the levels that were placed. The minimum for the central block was recomputed: 1 800 → 2 484 tris. |
+| 2026-07-31 | R6 applied to the first part in full. Added: a label is mandatory for gauges of internal features of the form (otherwise they are indistinguishable from a miss — a chin 36.9 mm wide against a silhouette of 100.3 looked like a defect); a section is treated as an ellipse with an integral around the perimeter rather than a single radius; gauges of internal features are excluded from the section calculation; the level count is taken from the levels that were placed — a count of places to compare at, not a ring quota (R6, item 11). The minimum for the central block was recomputed: 1 800 → 2 484 tris. |
 | 2026-07-30 | R6 refined during application: width and depth are taken at a common level (otherwise there is no section); the section "The status of the metrics" was added — metrics from a 2D reference are advisory, the reference is a support for proportions but not a one-to-one standard, and presenting them as mandatory to reproduce exactly is forbidden. |
 | 2026-07-30 | R6 applied and **approved**. The procedure grew from 8 steps to 12. Findings: drawn joint lines are unreliable as a source of levels on a rendered reference (shading gives equally dark pixels); joint lines cut the mask of the figure and require gaps to be closed; the reference's own asymmetry turned out to be four times the tolerance, hence the requirement to compare full bounding measurements rather than half-widths; measured bounding measurements are fed back into R2 — an assumed torso radius of 150 mm turned out to be an ellipse with a governing radius of curvature of 62 mm, that is, the polygon minimum had been overstated. |
 | 2026-07-30 | R5 added — setting up the scene for the reference, and failure mode A9 (dimensionless scene). |

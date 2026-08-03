@@ -52,14 +52,15 @@ The beats come from the regulation — see [step-cycle.md](step-cycle.md), §4.
 
 **The rule of economy.** Everything that does not require my eye between calls goes into **one**
 `execute_blender_code` block. A separate call is justified only where the next action depends on
-what I saw. With the four mandatory view angles (see [phases.md](phases.md), §11.1)
-that comes to **seven** calls to the server, not fourteen.
+what I saw. Beat 4's whole frame set goes in **one** block as well — there is one server and the scene state is
+shared, so a view angle set by one call and a screenshot taken by another is a real failure mode.
+That comes to **three** calls to the server per step, not fourteen.
 
 | Beat | What performs it | Calls |
 |------|-----------------|-----------|
 | 1 — name | a line in the journal (§8); Blender is not touched | 0 |
 | 2–3 — operate and shape | one block: `pp.snapshot()` + `pp.shots()` (the point and the "before" pictures) → the operation → shaping | **1** |
-| 4 — inspect | one block sets the first view angle, then one screenshot per angle; the change of angle between shots goes inside the block of the next shot | **1 + n** |
+| 4 — inspect | one block: every channel over every mandatory view angle, angle changes and screenshots interleaved inside it (§6). Splitting this across calls is what lets one caller's angle end up in another's screenshot | **1** |
 | 5–6 — verify and decide | one block: `pp.gauge()`, `pp.bbox()`, `pp.budget(share)`, `pp.topology()`, `pp.seam()`, `pp.mods()`; then a line in the journal | **1** |
 
 **The stage gate**, additionally: `pp.gauge()` over all measurements, `pp.snapshot()` as a rollback
@@ -113,7 +114,7 @@ result = {"установлено": mod.VERSION, "функции": sorted(mod.__
 | `mm_per_unit()` | millimetres per scene unit — from `unit_settings`, not as a constant |
 | `section(ob, coord, axis)` | the bounding measurement **in the cutting plane**, the centre, **the number of contours**, tangent points |
 | `bbox(ob)` | the final result's bounding box: width, depth, height, centre, bottom, top |
-| `gauge(ob, levels, tol)` | the comparison; three outcomes per level: in tolerance, **empty** (a refusal), **a turn** |
+| `gauge(ob, levels, tol)` | the comparison; `tol` is the **form** tolerance assigned at M2, never the measurement tolerance; three outcomes per level: in tolerance, **empty** (a refusal), **a turn** |
 | `budget(ob, share)` | cage polygons against the final result, and a **verdict** against the range |
 | `topology(ob)` | n-gons, triangles, loose vertices, open and wire edges, edges with 3+ faces, poles — **with addresses** |
 | `seam(ob, axis)` | seam vertices, deviation, those that crossed the plane, doubled ones, poles on the seam with addresses |
@@ -220,6 +221,20 @@ all three and change them as a side effect.
 
 ---
 
+### 4.4 M6 — delivery
+
+[phases.md](phases.md), M6 hands the part over in the delivery form decided at M2. The cage form
+needs no operation: the stack stays as it is. The baked form needs one, and it is the only bake in
+the whole build.
+
+| Operation of the regulation | What does it | What checks it |
+|---------------------|--------------|-----------------|
+| Bake subdivision at level L | `bpy.ops.object.modifier_apply(modifier="SUBSURF")` with the object active and selected; mirroring is applied first, so the halves are one shell before the surface is frozen | `pp.mods()["стек"]` is empty; `pp.topology()` — quads only, zero open edges; `pp.budget()` on the baked mesh, since the multiplier no longer applies |
+| Take the polygon report | `pp.budget(ob, share=(min, max))` **off the result of the transforms**, never off the cage | the verdict is inside the part's share of the R2 range |
+
+Baking earlier than M6 is a violation of the phase, not a shortcut: it removes the ability to
+re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
+
 ## 5. The regulation's checks
 
 | Check | Tool | Verified |
@@ -237,32 +252,21 @@ all three and change them as a side effect.
 | Full comparison against the markup | `pp.gauge()` — empty and turn are counted separately | ✓ three levels gave three different outcomes: in tolerance, turn, empty |
 | The contents of the scene, R1 | `get_objects_summary` | ✓ |
 
-### 4.4 M6 — delivery
-
-[phases.md](phases.md), M6 hands the part over in the delivery form decided at M2. The cage form
-needs no operation: the stack stays as it is. The baked form needs one, and it is the only bake in
-the whole build.
-
-| Operation of the regulation | What does it | What checks it |
-|---------------------|--------------|-----------------|
-| Bake subdivision at level L | `bpy.ops.object.modifier_apply(modifier="SUBSURF")` with the object active and selected; mirroring is applied first, so the halves are one shell before the surface is frozen | `pp.mods()["стек"]` is empty; `pp.topology()` — quads only, zero open edges; `pp.budget()` on the baked mesh, since the multiplier no longer applies |
-| Take the polygon report | `pp.budget(ob, share=(min, max))` **off the result of the transforms**, never off the cage | the verdict is inside the part's share of the R2 range |
-
-Baking earlier than M6 is a violation of the phase, not a shortcut: it removes the ability to
-re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
-
 ### 5.1 Perception channels
 
 | Channel | With what |
 |-------|-----|
 | Silhouette fill | `pp.channel("силуэт")` — flat lighting, one colour, overlays off |
 | Smooth shading | `pp.channel("затенение")` (shading) — `use_smooth` via `foreach_set`, an even grey |
+| **Reflective / curvature** | `pp.channel("кривизна")` (curvature) — a striped or mirror material. Without it "a clean arc" cannot be verified at all: a curvature break with zero positional error is invisible on a diffuse material ([phases.md](phases.md), §11.2) |
+| **The model over the reference** | `pp.channel("рабочий")` (working) — the reference drawn behind the model. The only channel that answers whether the contour matches the art |
 | Wireframe over the smoothed result | `pp.channel("каркас")` (wireframe) — `show_wire`, `show_all_edges`, `show_on_cage` |
 | The three-quarter view against the reference | `pp.view("три_четверти")` (three_quarter) + a screenshot; the reference's own ¾ view file is placed beside it if there is one. An orthographic view of the model and a perspective render of the reference are compared by proportions, not by overlay |
 | Comparison against a point | `pp.shots()` before and after, reading the two PNGs |
 | Mirroring the picture | flip the PNG **outside** Blender. A mirrored view angle is not a substitute: `pp.view` with a reflected azimuth shows the model's other side, not a mirrored picture of the same side |
 
-The way back to the working state is `pp.channel("рабочий")` (working).
+The way back to the working state is the same `pp.channel("рабочий")` (working) — it is both the
+overlay channel and the resting state of the viewport.
 
 ---
 
@@ -434,13 +438,13 @@ of the same view angles, taken **through different channels**:
 |-------|-------|---------|
 | Surface | `pp.channel("затенение")` — the flow of the surface | `pp.ПРОВЕРКА_КОЛЬЦА` + `pp.orbit()` |
 | Surface | `pp.channel("кривизна")` — continuity of curvature | the same |
-| Surface | `pp.channel("силуэт")` — **the only channel a contour may be judged on** (§6.26) | the same |
-| Surface | `pp.channel("рабочий")` — the model over the reference | front and profile |
+| Surface | `pp.channel("силуэт")` — **the only channel the contour's shape may be read on** (§6.26) | the same |
+| Surface | `pp.channel("рабочий")` — the model over the reference; **the only channel that answers whether the contour matches the art** | front and profile |
 | Mesh | `pp.channel("каркас")` | the same as the surface pass, orbit included |
 
-Three judging channels for the surface, not one — silhouette, shading and curvature. The fourth
-Surface row, the working overlay, is how the reference is attached, not a channel the form is
-judged on. Shading alone cannot answer the question beat 4 asks: a
+Four judging channels for the surface, not one. Silhouette, shading and curvature judge the form
+itself; the working overlay judges it against the art, and it is the only one that can — the other
+three do not carry the reference in frame. Shading alone cannot answer the question beat 4 asks: a
 curvature break at zero positional error is invisible on a diffuse material and reads immediately on
 a striped one, and the contour measured in shading is the boundary of the lighting rather than of
 the form. Switch the guides off before the mesh pass — §6.23б.
@@ -472,7 +476,8 @@ The reviewer's assignment must include:
    behind the model, and on those the divergence of contours is visible;
 3. **an explicit ban on judging by general knowledge of the object**: the target is this
    reference, not a typical head, arm or torso;
-4. **the tolerance and what is being measured** — otherwise "far too wide" will turn out to be two
+4. **the form tolerance and what is being measured** — the one assigned at M2, not the measurement
+   tolerance; otherwise "far too wide" will turn out to be two
    millimetres.
 
 **Reviewers do not go into Blender.** The screenshots are prepared by whoever is running the step,
@@ -766,9 +771,11 @@ shift around the whole circuit. On the surface this reads as a shelf and as swir
 
 ### 6.14 A cut exactly through vertices
 
-With a zero tolerance on the cut, vertices lying exactly on the plane are distributed between the
+With a zero epsilon on the cut, vertices lying exactly on the plane are distributed between the
 sides unpredictably, and the contour tears. And a cut along a ring of the cage is exactly that
-case. `pp.section()` cuts with a non-zero tolerance.
+case. `pp.section()` cuts with a non-zero epsilon. This epsilon is a numerical guard inside the
+tool and is unrelated to either of the two tolerances of the methodology — do not read one for the
+other.
 
 ### 6.15 A tangent section looks like two contours
 

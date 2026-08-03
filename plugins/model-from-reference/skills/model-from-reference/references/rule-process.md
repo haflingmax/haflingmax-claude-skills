@@ -23,7 +23,7 @@ worse than having no rules, because it stops you looking.
 ### The lifecycle of a rule
 
 ```
-draft  ──applied──>  under verification  ──it worked──>  approved
+draft  ──carried through a build──>  under verification  ──it worked──>  approved
                             │
                             └──it did not──>  reword  ──or──>  rejected
 ```
