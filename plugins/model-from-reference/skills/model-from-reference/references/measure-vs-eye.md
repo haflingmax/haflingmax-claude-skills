@@ -65,9 +65,10 @@ measurement, not as a hint, not as a reference figure.
 
 ### 5.4 When it is the measurement under suspicion, not the form
 
-Tolerance describes the precision of measuring the reference, not an obligation on the form to
-coincide with a number (see [work-rules.md](work-rules.md), R6, "The status of the metrics"). A
-divergence is grounds to investigate, not an automatic defect.
+The **measurement** tolerance describes the precision of measuring the reference, and it is not an
+obligation on the form to coincide with a number (see [work-rules.md](work-rules.md), R6, "The
+status of the metrics"). How far the form may diverge is the *form* tolerance (§7), and that one is
+an obligation — a wide one. A divergence is grounds to investigate, not an automatic defect.
 
 **Signs that the measurement is at fault:**
 
@@ -178,8 +179,9 @@ Proven twice: a shoulder went out by +10.6 mm at a level between two converged r
 by +24 mm, rising above the shoulders. Both times every measurement was in tolerance.
 
 **What to do:** include in the step's verification at least one level **between** measurements, with
-an expected value computed as a smooth interpolation of the neighbours. Going out of tolerance there
-is as much a rejection as going out at a measurement.
+an expected value computed as a smooth interpolation of the neighbours. Going outside the **form**
+tolerance there is as much a rejection as going outside it at a measurement — the interpolated level
+is compared model-against-reference like any other, so it runs on the same tolerance.
 
 **Stronger than that: what must be checked is not levels but the SLOPE of the contour along its
 whole run.** Rings each converged onto their own measurement give zero at every measurement — and

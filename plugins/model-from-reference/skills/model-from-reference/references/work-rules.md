@@ -657,8 +657,10 @@ written.
 the horizontal stroke of the measured length at a level. That is a different thing from a **cage
 segment**, an edge of a ring on the control cage, which is what "segments around the girth" always
 refers to. Neither is ever a face on the final surface: the requirement N and the R2 floor are
-counted in faces (item 11). Three words, three things; the context makes which one plain, but never
-convert between them silently.
+counted in faces (item 11). A third, unrelated sense also lives in this rule — a **height segment**, the vertical block of the
+part a level falls into (see "Levels are grouped into vertical segments" below). It divides the part
+along Z and has nothing to do with going around it. Four words, four things; context makes which one
+plain, but never convert between them silently.
 
 9. **Assemble the markup — that is the presentation.** Both views of the reference side by side on a
    common vertical scale; at each level a segment of exactly the measured length with ticks at its
@@ -709,8 +711,8 @@ arms. Four findings, all folded into the procedure:
 - **Joint lines cut the mask of the figure.** Without closing the gaps, the number of silhouette
   pieces jumped from 1 to 7 on adjacent rows, and the torso could not be separated from the arms.
   With gaps up to 6 px closed, the profile became structural. Hence item 3.
-- **The reference is four times more asymmetric than the tolerance:** a median of 8 mm and a 99th
-  percentile of 16 mm against a tolerance of ±4 mm. The systematic maximum is at head level. So
+- **The reference is four times more asymmetric than the measurement tolerance:** a median of 8 mm
+  and a 99th percentile of 16 mm against a measurement tolerance of ±4 mm. The systematic maximum is at head level. So
   full bounding measurements have to be compared rather than half-widths, and the reference is not
   proof of the model's symmetry. Hence items 7 and 8. As a side effect: the 229 mm outlier in the
   very lowest row turned out to be a mask artefact — which is why the axis is taken as a median and
@@ -793,7 +795,7 @@ Every finding is a **question with numbers**, not a verdict. Two kinds are kept 
 - **An observation** — a smooth, consistent divergence from my own gauge. That is the author's
   decision, and it takes priority over my detector.
 - **A probable error** — a sharp dip over a small height, a repeated value, a pair of levels closer
-  than the tolerance. That contradicts itself, not me.
+  than the **measurement** tolerance. That contradicts itself, not me.
 
 What tells one from the other is comparison against **two** supports at once: against the part's
 boundary and against the full silhouette. A finding must not be phrased as a fact: three of the

@@ -224,8 +224,9 @@ all three and change them as a side effect.
 ### 4.4 M6 — delivery
 
 [phases.md](phases.md), M6 hands the part over in the delivery form decided at M2. The cage form
-needs no operation: the stack stays as it is. The baked form needs one, and it is the only bake in
-the whole build.
+needs no operation: the stack stays as it is. The baked form applies **both** transforms — mirroring
+first, so the halves are one shell before the surface is frozen, then subdivision — and those are
+the only bakes in the whole build.
 
 | Operation of the regulation | What does it | What checks it |
 |---------------------|--------------|-----------------|
@@ -249,6 +250,7 @@ re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
 | Stack order and equality of levels | `pp.mods()` | ✓ order and levels are read; when the levels diverge, `evaluated` fails |
 | Transforms not baked in — **cage delivery form only** | `pp.mods()["стек"]` (stack) — MIRROR and SUBSURF still there | ✓. In the baked-subdivision form decided at M2, SUBSURF is applied at M6 and this check inverts: the stack is empty and the polygon count is the baked one |
 | Polygon count against the range | `pp.budget(ob, share=(min, max))["вердикт"]` (verdict) | ✓ 768 out of (200, 800) → "near the upper bound", 32 to spare |
+| The girth requirement N (the M5 gate) | `pp.section()` at the most demanding level, counting the faces around the resulting contour **on the subdivided result**, never on the cage; compared against N from M2, item 3 | ✓ a cage of 48 segments at L = 1 gives 96 faces around the girth, against N = 32 |
 | Full comparison against the markup | `pp.gauge()` — empty and turn are counted separately | ✓ three levels gave three different outcomes: in tolerance, turn, empty |
 | The contents of the scene, R1 | `get_objects_summary` | ✓ |
 
@@ -259,7 +261,7 @@ re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
 | Silhouette fill | `pp.channel("силуэт")` — flat lighting, one colour, overlays off |
 | Smooth shading | `pp.channel("затенение")` (shading) — `use_smooth` via `foreach_set`, an even grey |
 | **Reflective / curvature** | `pp.channel("кривизна")` (curvature) — a striped or mirror material. Without it "a clean arc" cannot be verified at all: a curvature break with zero positional error is invisible on a diffuse material ([phases.md](phases.md), §11.2) |
-| **The model over the reference** | `pp.channel("рабочий")` (working) — the reference drawn behind the model. The only channel that answers whether the contour matches the art |
+| **The model over the reference** | `pp.channel("рабочий")` (working) — the reference drawn behind the model, art and model in one frame. The contour itself is still judged on the silhouette (§6.26) |
 | Wireframe over the smoothed result | `pp.channel("каркас")` (wireframe) — `show_wire`, `show_all_edges`, `show_on_cage` |
 | The three-quarter view against the reference | `pp.view("три_четверти")` (three_quarter) + a screenshot; the reference's own ¾ view file is placed beside it if there is one. An orthographic view of the model and a perspective render of the reference are compared by proportions, not by overlay |
 | Comparison against a point | `pp.shots()` before and after, reading the two PNGs |
@@ -438,13 +440,14 @@ of the same view angles, taken **through different channels**:
 |-------|-------|---------|
 | Surface | `pp.channel("затенение")` — the flow of the surface | `pp.ПРОВЕРКА_КОЛЬЦА` + `pp.orbit()` |
 | Surface | `pp.channel("кривизна")` — continuity of curvature | the same |
-| Surface | `pp.channel("силуэт")` — **the only channel the contour's shape may be read on** (§6.26) | the same |
-| Surface | `pp.channel("рабочий")` — the model over the reference; **the only channel that answers whether the contour matches the art** | front and profile |
+| Surface | `pp.channel("силуэт")` — **the only channel a contour may be judged on**, shape and divergence alike (§6.26) | the same |
+| Surface | `pp.channel("рабочий")` — the model over the reference, art and model in one frame. Fastest way to see *that* something is off; the contour itself is still judged on the silhouette | front and profile |
 | Mesh | `pp.channel("каркас")` | the same as the surface pass, orbit included |
 
-Four judging channels for the surface, not one. Silhouette, shading and curvature judge the form
-itself; the working overlay judges it against the art, and it is the only one that can — the other
-three do not carry the reference in frame. Shading alone cannot answer the question beat 4 asks: a
+Four judging channels for the surface, not one. Shading gives the flow, curvature the continuity,
+the silhouette the contour, and the working overlay puts the art in the same frame. Shading alone
+cannot answer beat 4's question: a curvature break at zero positional error is invisible on a
+diffuse material, and the contour measured in shading is the boundary of the lighting. Shading alone cannot answer the question beat 4 asks: a
 curvature break at zero positional error is invisible on a diffuse material and reads immediately on
 a striped one, and the contour measured in shading is the boundary of the lighting rather than of
 the form. Switch the guides off before the mesh pass — §6.23б.

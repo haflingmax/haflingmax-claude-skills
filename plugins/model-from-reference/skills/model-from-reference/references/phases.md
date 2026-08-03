@@ -150,9 +150,16 @@ geometry that lands in the count; building started without confirmation of the r
    not assigned in advance (see [measure-vs-eye.md](measure-vs-eye.md), §8).
    Assign the **form tolerance** in the same item: how far the model is entitled to diverge from the
    reference (see [measure-vs-eye.md](measure-vs-eye.md), §7). It is **wider** than the measurement
-   tolerance R6 item 8 declares, and it is the tolerance every later gate and every step closure
-   compares against; the measurement tolerance never closes anything. Assigning it here is what
-   makes those gates checkable — without it they cite a decision nobody took.
+   tolerance R6 item 8 declares, and the line between them is **what is being compared**:
+   - **model against the reference** — the only comparison that judges form against art. Always the
+     **form** tolerance: every step closure (beat 6) and every phase gate that reads the model.
+   - **two readings of the same kind against each other** — markup against the reference (M1, item
+     6), one built end cap against another (M5, the joint check), one markup level against its
+     neighbour (R7). No form is being judged, so the **measurement** tolerance governs, and it is
+     right that it is the tighter one.
+
+   Assigning the form tolerance here is what makes the first group checkable — without it those
+   gates cite a decision nobody took.
 4. **Estimate the polygon count — as a forecast, not as a quota.** The estimate is needed only to
    check the budget and is given as **one number per part**.
    It must be computed **from surface area and the required face size**, not by decomposing the mesh
@@ -192,7 +199,7 @@ ring heights or section bounding measurements have appeared in the plan **in any
 name** — forecast, reference figure, zone boundaries, guideline.
 The only numbers admissible in the plan: the part boundaries, the part's overall bounding
 measurement, the required number of faces around the girth at the most demanding section (N), the
-subdivision level L, the form tolerance, the bounds of the polygon range, the one-number-per-part polygon forecast of
+subdivision level L, the form tolerance, the limits of item 7, the bounds of the polygon range, the one-number-per-part polygon forecast of
 item 4, and a total ring forecast not tied to heights.
 
 ### M3 — Blockout: volumes
@@ -415,8 +422,8 @@ It is not only the angle that has to change but the channel: one channel hides w
 
 | Channel | What it shows |
 |---------|---------------|
-| Silhouette fill | **The shape of the model's own contour.** Under shading the far side darkens and the contour is lost exactly where it is being read, so this is the channel the contour's *shape* is judged on |
-| **The model drawn over the reference** | **Whether that contour matches the art.** The silhouette shows what the contour is; only this channel shows what it should have been. The two questions are different, and each has exactly one channel — asking either of them on the other's channel is the mistake |
+| Silhouette fill | **The contour** — its shape and its divergence from the reference alike. Under shading the far side converges in brightness with the background and the contour is lost exactly where it is being read, which produces findings like "a flat cap" where the light simply ran out ([blender.md](blender.md), §6.26) |
+| **The model drawn over the reference** | The art and the model in one frame, so a divergence is seen rather than remembered. It is the quickest way to notice *that* something is off; the contour itself is still judged on the silhouette channel, which decides if the two disagree |
 | Smooth shading with a plain material | How the surface flows: tearing and bumps are visible only here |
 | **Reflective channel** (a mirror or striped material, an environment reflection) | **Continuity of curvature.** A diffuse grey material shows the position of the surface and hides its character: a curvature break with zero positional error is not visible on it at all. On a reflective one it reads immediately — the reflected stripe breaks where the curvature breaks. Without this channel "a clean arc" cannot be verified |
 | Wireframe over the smoothed result | What is being edited and what comes out of it — at the same time |
@@ -547,7 +554,7 @@ Any change of input is declared explicitly and classified before work continues.
 | What changed | What happens |
 |--------------|--------------|
 | The reference, its normalisation or its placement (R5) | M1 is repeated in full; every part already built is re-verified; work does not continue until the human decides the fate of what has been accepted |
-| The current part's markup | The form is not redone automatically: the guides are rebuilt, a full verification is run as at a gate, and divergences are handled per [measure-vs-eye.md](measure-vs-eye.md), §5.2/§5.4. Accepted stages are not reopened if verification is within tolerance |
+| The current part's markup | The form is not redone automatically: the guides are rebuilt, a full verification is run as at a gate, and divergences are handled per [measure-vs-eye.md](measure-vs-eye.md), §5.2/§5.4. Accepted stages are not reopened if verification is within the **form** tolerance |
 | The part boundaries | This is a change of contract: return to M2 and re-accept the joints |
 | The polygon range (R2) | The M2 forecast is recomputed, then proceed per §12.2 |
 

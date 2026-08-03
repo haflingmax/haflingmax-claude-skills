@@ -251,8 +251,7 @@ oval and the other is a box. The top view had never been taken, because the numb
 
 | Pass | What it looks at | With what |
 |------|------------------|-----------|
-| **Surface** | the form: **does the contour run as one continuous arc**, is there a break, a straight insert, bulges, hollows; does it sit on the reference | smooth shading, the reflective channel, silhouette fill, and — for agreement with the art rather
-than the shape of the contour itself — the model drawn over the reference |
+| **Surface** | the form: **does the contour run as one continuous arc**, is there a break, a straight insert, bulges, hollows; does it sit on the reference | smooth shading, the reflective channel, silhouette fill, and the model drawn over the reference |
 | **Mesh** | how the form is made: edge flow, vertex distribution, poles, the seam | the wireframe over the smoothed result |
 
 **The eye judges the form. Measurement is a coarse guard of proportions, and nothing more.**

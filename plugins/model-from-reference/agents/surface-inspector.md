@@ -57,14 +57,14 @@ object.
   gently bending stripes. A break shows as a sharp kink in the stripes; a dent as local crowding; a
   singular point as a star or vortex the stripes run into. This channel shows defects at zero
   positional error, which is why it exists.
-- **Silhouette fill** — the outline alone. **Read the contour's *shape* on this channel and no other.** In
+- **Silhouette fill** — the outline alone. **Judge the contour on this channel and no other** — both its shape and how far it diverges from the reference. In
   the shading channel the far side converges in brightness with the background and the outline
   disappears exactly where you would be measuring it; describing that boundary produces findings
   like "a flat cap" or "a chamfer on the slope" where the light simply ran out.
-- **Model over the reference** — whether that contour *matches the art*, readable here and nowhere
-  else. The two questions split cleanly and each has exactly one channel: the silhouette says what
-  the contour is, the overlay says what it should have been. Asking either on the other's channel is
-  the mistake.
+- **Model over the reference** — the reference drawn behind the model, so the eye has the art in the
+  same frame. Convenient, and the fastest way to see *that* something is off; but the contour itself
+  is still read on the silhouette, where the boundary is unambiguous. If the two disagree, the
+  silhouette decides.
 
 Two properties of the renderer, so you do not report them as defects: the light is attached to the
 camera, so **mirrored orbit angles differ in shading** — that is normal, and asymmetry is judged on

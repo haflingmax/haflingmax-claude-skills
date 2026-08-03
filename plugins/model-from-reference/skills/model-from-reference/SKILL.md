@@ -149,7 +149,7 @@ never in those two views — look for it in the reference's shading, or in a thi
 
 | Look | What it judges | Channel |
 |------|----------------|---------|
-| **Surface** | Does the contour run as one continuous arc? Any straight insert that then breaks? Bulges, hollows, ripples? Does it sit on the reference? | smooth shading, reflective/striped matcap, silhouette fill |
+| **Surface** | Does the contour run as one continuous arc? Any straight insert that then breaks? Bulges, hollows, ripples? Does it sit on the reference? | smooth shading, reflective/striped matcap, silhouette fill, and the model drawn over the reference |
 | **Edge flow** | How the form is made: loop routing, poles, density gradient, the mirror seam | the cage drawn over the smoothed result |
 | **Vertex placement** | Distribution along rings and along meridians, spikes, the seam | the cage plus the reflective channel |
 
@@ -211,8 +211,9 @@ guide object, a zone or level number, or a fraction of the part's height. Rewrit
 Do not run beat 4 with fewer than four viewpoints — front, side, top, orbit — and fewer than four
 surface channels — silhouette fill, smooth shading, the reflective channel, and the model drawn over
 the reference — plus the cage over the smoothed result and a close-up of the zone. The canonical sets live in phases.md §11.1 and
-§11.2. A contour's shape is read on the silhouette channel and on no other; whether it matches the art is
-read on the model-over-reference overlay and on no other.
+§11.2. The contour — its shape and its divergence from the art alike — is judged on the silhouette channel
+and on no other (blender.md §6.26). In shading the contour is the boundary of the lighting, not of
+the form.
 
 Do not send a zone to inspection without the reference attached.
 

@@ -42,9 +42,9 @@ Two orthographic views are not enough. The set is:
 | **Orbit, six angles** | Ridges standing edge-on to the orthographic cameras are invisible in them |
 | Smooth shading | Volume, hollows, folds, flat facets |
 | Reflective / striped matcap | Continuity of curvature — shows breaks at zero positional error |
-| Silhouette fill | The outline alone. **The contour's shape is read on this channel only** — shading darkens the far side and the contour is lost exactly where it is being measured |
+| Silhouette fill | The outline alone. **Contour judgements are made on this channel only** — shape and divergence from the art alike — shading darkens the far side and the contour is lost exactly where it is being measured |
 | Cage over the smoothed result | For the flow and placement looks — **same angles as the surface pass, orbit included** |
-| **Model over the reference** | The working channel draws the reference behind the model; whether the contour *matches the art* reads here and nowhere else. Shape on the silhouette, agreement on the overlay — two questions, one channel each |
+| **Model over the reference** | The working channel draws the reference behind the model, putting the art in the same frame. It shows *that* something is off fastest; the contour itself is still read on the silhouette, which decides if the two disagree |
 | Close-ups of the zone | A defect a fraction of a millimetre deep is invisible in a wide shot |
 
 **Hide the guides before shooting the cage.** A guide plane crossing the frame covers the ring line
