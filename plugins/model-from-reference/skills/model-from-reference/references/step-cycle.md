@@ -3,7 +3,7 @@
 This file is the operating manual for the unit of work. It covers what the box modelling method is
 and is not (§1), who judges what — the builder every step, the human every stage (§2), what counts
 as a step and when a step is finished (§3), the six beats every step passes through, including the
-mandatory unbounded fix loop and the iteration limits (§4), rollback and rollback points (§13), and
+mandatory unbounded fix loop and the pass limits (§4), rollback and rollback points (§13), and
 the step journal (§14). Read it before running the cycle for the first time on a build, and again
 whenever a step refuses to close. The rest of the source regulation lives in the other reference
 files — §§5–8 in [measure-vs-eye.md](measure-vs-eye.md), §§9–12 and §§15–17 in
@@ -20,7 +20,8 @@ described in a separate **editor mapping document**:
 | Blender 5.1+ via the MCP server | [blender.md](blender.md) |
 
 **Status:** `draft` — the regulation was assembled from sources and from a review of three failed
-attempts; it has never been applied end to end in practice.
+attempts and has been applied to a real build; no build has yet been carried through under it from
+first setup to delivery. The statuses are defined in [rule-process.md](rule-process.md).
 
 **Terms.** To *engage* a transform is to turn its effect on the geometry on, reversibly. To *bake*
 it is to turn its result into the mesh itself, irreversibly. The distinction matters: almost the
@@ -70,7 +71,7 @@ A **stage** is a set of steps after which the form has moved into a new quality,
 rolling back past that boundary would mean redoing the whole stage.
 
 Acceptance follows **R3** (see [work-rules.md](work-rules.md)): the human says "accepted" or gives
-corrections; corrections are the same iteration, not the next stage.
+corrections; corrections are a new pass over the same stage, not a move to the next one.
 
 What is specific to this method:
 
@@ -102,13 +103,15 @@ range; the list of steps **from the journal** (§14).
 
 A **topological operation** is one that changes the composition of the mesh: continue the shell,
 cut a loop, run a loop along a form line, close an end cap, collapse density, delete a region. The
-full catalogue — see [phases.md](phases.md), §10.1.
+full catalogue — see [phases.md](phases.md), §10.1. Two rows of that catalogue — setting up
+mirroring and engaging subdivision — are marked as *not* steps: they touch no geometry, and beat 3
+is not performed on them.
 
 **What is not a step:**
 
 | Not a step | Why | What it is instead |
 |------------|-----|--------------------|
-| Moving a vertex or a group of vertices | Does not change the composition of the mesh | The content of a step: inside one step vertices are moved as many times as needed |
+| Moving a vertex or a group of vertices | Does not change the composition of the mesh | The content of a step: inside one step vertices are moved as many times as you please |
 | Flattening a section, bowing a surface inward, creating a surface turn | These are goals of shaping, not operations | Shaping tasks — see [phases.md](phases.md), §10.4 |
 | A markup block (head, pelvis, chest) | Too coarse; several changes in the character of the form live inside it | 3–6 steps |
 | A whole phase | This is a set of stages | See [phases.md](phases.md), §9 |
@@ -138,8 +141,8 @@ performed after the fact. Skipping is permitted only where the beat itself expli
 and only with the reason noted in the journal.
 
 **How this relates to the overall process.** The step is an internal unit of phases M3–M4. The
-sub-step cycle of the surrounding process (studied → agreed → recorded → performed → checked; see
-[work-rules.md](work-rules.md), R8, "Procedure") applies to phases M1–M6 as wholes; the six-beat
+sub-step cycle of the surrounding process (studied → agreed → recorded → performed → checked;
+defined in [rule-process.md](rule-process.md)) applies to phases M1–M6 as wholes; the six-beat
 cycle applies to a step inside the "performed" state.
 
 ### Beat 1 — name
@@ -196,8 +199,13 @@ several changes in the character of the form — the chest and the shoulder gird
 shoulder, the pelvis and the lower body — is forbidden. Between zones a closure of the step is
 placed: an inspection, and only then the next zone.
 
-**Sign of violation:** more than four rings in one convergence loop, or its height range covering
+**Sign of violation:** more than four rings in one convergence *loop*, or its height range covering
 more than one form feature from the topology plan.
+
+The sign is groping, not ring count. Where the relation between cage and limit surface is linear,
+the chain is a tridiagonal system and is **solved** in one sweep rather than approached; a solve is
+not a loop and the four-ring sign does not apply to it — see
+[measure-vs-eye.md](measure-vs-eye.md), §5.11a.
 
 ### 3.1 One block at a time, and to a finish
 
@@ -208,7 +216,7 @@ but the way checking works.
 An inspection answers the question "what is wrong **in this zone**". When three zones have been
 changed in one pass, the inspection's finding cannot be tied to a cause: it is unclear which
 correction produced it, and rollback loses its meaning — everything would have to be rolled back.
-The fix loop (beat 4) stops converging, because every iteration changes the conditions for the
+The fix loop (beat 4) stops converging, because every pass changes the conditions for the
 neighbours.
 
 **Rule:** one block is taken, brought to the state "cannot be done better at this density", closed
@@ -221,8 +229,21 @@ correction produced the finding.
 
 ### Beat 4 — inspect
 
-Mandatory: two orthographic views, **the view from above** and **rotation**. Orthographic views are
-not enough. Perception channels — see [phases.md](phases.md), §11.2.
+Mandatory: two orthographic views, **the view from above** and **an orbit**. Orthographic views are
+not enough. The set of four is defined in [phases.md](phases.md), §11.1, and the perception channels
+in §11.2 of the same file; that is where both live. How the set is executed against the server is
+[blender.md](blender.md), §6, "Inspection in two passes".
+
+Proven expensively, and it is the failure the whole method exists to prevent. A torso was built
+whose front and side silhouettes both agreed with the reference to within 5 mm against a form
+tolerance of 8 mm — every level in tolerance, on both orthographic views, for weeks. Seen from
+above, the same torso was a flat slab: the back ran as a straight line meeting the sides at two
+hard corners, and a longitudinal ridge ran its whole height. Two independent inspections named it
+in one word — a box — and both said "rebuild, not repair".
+
+Nothing was wrong with the measurements. They could not see it: a bounding box is identical for an
+ellipse and for a rounded rectangle, so width and depth agree to the millimetre while one is an
+oval and the other is a box. The top view had never been taken, because the numbers agreed.
 
 **An inspection runs in two passes, and these are different checks.**
 
@@ -347,8 +368,9 @@ One of four:
 - **close the step** — the fix loop (beat 4) has closed: none of the three looks names a defect in
   the affected zone. The form has been taken as far as this density allows **and** the operation's
   own check has been passed (see [phases.md](phases.md), §10.1). The divergence from the
-  measurement is then either within the measurement tolerance (R6, item 8, see
-  [work-rules.md](work-rules.md)) or **explained by density**: on a coarse mesh a section cannot
+  measurement is then either within the **form tolerance** — the one set at M2, not the measurement
+  tolerance the reference was read with (see [measure-vs-eye.md](measure-vs-eye.md), §7) — or
+  **explained by density**: on a coarse mesh a section cannot
   coincide with the measurement, and to chase the coincidence is to drive the form to fit a number
   before its time. An explanation by density is written into the journal with the size of the
   divergence and is closed at the step where density grew; it cannot be left unaccounted for;
@@ -362,8 +384,8 @@ The decision is the builder's.
 
 ### 4.1 Limits
 
-The three limits — the number of returns to beat 3 within one step, the number of iterations of a
-stage, and the number of repair iterations at M5 — are assigned by **a single decision at M2, item
+The three limits — the number of returns to beat 3 within one step, the number of **passes** over a
+stage, and the number of **repair passes** at M5 — are assigned by **a single decision at M2, item
 7** (see [phases.md](phases.md)). This document sets no specific numbers: they belong to the task,
 not to the method.
 
@@ -381,7 +403,7 @@ ways out, in this order:
 3. neither one nor the other — roll back to the step that built the zone (see
    [phases.md](phases.md), §11.5).
 
-**Reaching the limit on a stage's iterations** means that what is wrong is not the stage but the
+**Reaching the limit on a stage's passes** means that what is wrong is not the stage but the
 decision that preceded it: return to the previous accepted stage or to the topology plan, and
 present the reason to the human.
 

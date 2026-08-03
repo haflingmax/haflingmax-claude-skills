@@ -33,22 +33,41 @@ images you are given.
 
 ## What you are given
 
-- **The reference art**, one or more views. Read it first. This is what the work must match — judge
-  against it, not against generic anatomy or a mental picture of the object.
-- **Frames of the work**: two orthographic views, a view from above, an orbit of six angles, and
-  close-ups of the zone. Usually in several channels.
+- **The reference art**, one or more views, plus crops of the zone. Read it first.
+- **Frames of the work**: two orthographic views, a view from above, an orbit of six angles,
+  close-ups of the zone, and frames of the model drawn over the reference. Usually in several
+  channels.
 - **The frame scale**: millimetres per pixel and the height of the frame's top edge, so you can
   convert a pixel row to a height in millimetres.
+- **The tolerance** for this part and what is measured against it — so that "far too wide" does not
+  turn out to be two millimetres.
 
-## The channels and what each shows
+**Judge against this reference, not against general knowledge of the object.** The target is the
+thing in these images, not a typical head, arm or torso. This is not a formality: on the first
+review ever run under these rules, an inspector reported that the widest part of a head belongs a
+third of the way down — true of a typical skull, false of the mannequin being built, where it sits
+at the middle and the model already had it right. A whole item of that review was about a different
+object.
 
-- **Smooth shading** — overall volume, hollows, gaps, folds, flat facets.
+## The channels, and which question each one may answer
+
+- **Smooth shading** — the flow of the surface: hollows, folds, flat facets, kinks. Use it for
+  form.
 - **Reflective / striped matcap** — continuity of curvature. A smooth form gives slow, parallel,
-  gently bending stripes. A break in the surface shows as a sharp kink in the stripes; a dent as a
-  local crowding; a singular point as a star or a vortex the stripes run into. This channel shows
-  defects at zero positional error, which is why it exists.
-- **Silhouette fill** — the outline alone, without shading noise. The view from above in this
-  channel is the fastest way to see whether a section is an oval or a box.
+  gently bending stripes. A break shows as a sharp kink in the stripes; a dent as local crowding; a
+  singular point as a star or vortex the stripes run into. This channel shows defects at zero
+  positional error, which is why it exists.
+- **Silhouette fill** — the outline alone. **Judge the contour on this channel and no other.** In
+  the shading channel the far side converges in brightness with the background and the outline
+  disappears exactly where you would be measuring it; describing that boundary produces findings
+  like "a flat cap" or "a chamfer on the slope" where the light simply ran out.
+- **Model over the reference** — divergence of contours against the art, readable here and nowhere
+  else.
+
+Two properties of the renderer, so you do not report them as defects: the light is attached to the
+camera, so **mirrored orbit angles differ in shading** — that is normal, and asymmetry is judged on
+contours, not on brightness. And the striped matcap produces moiré where the surface is nearly
+edge-on; crowded stripes at a silhouette are projection, not a defect.
 
 ## What to answer
 
@@ -68,12 +87,9 @@ images you are given.
 - A list of defects, coarsest first. For each: **where** (height in millimetres and which side),
   **what is visible**, and how coarse — trivial / noticeable / gross.
 - If something is not visible in the frames you were given, say so plainly. Do not infer it.
-- Distinguish what you can see from what you are guessing. A guess labelled as a guess is useful;
-  a guess presented as an observation costs a day of wrong work.
+- Distinguish what you can see from what you are guessing. A guess labelled as a guess is useful; a
+  guess presented as an observation costs a day of wrong work.
+- If your assignment states as fact that a particular edge is a boundary where a neighbouring mesh
+  attaches, take that as fact. If it does not, and you are unsure whether an edge is a boundary or
+  a break, report it and say which you think it is. Do not assume your way past it.
 - End with one verdict: **ACCEPTED** or **REJECTED**, and a single line saying why.
-
-## What is not yours to judge
-
-Flat cut edges at the boundary of the part are where a neighbouring mesh attaches — they are a
-decomposition boundary, not a defect. If you are unsure whether an edge is a boundary or a break,
-say which one you think it is and why, rather than assuming.

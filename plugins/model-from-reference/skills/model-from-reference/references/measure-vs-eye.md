@@ -5,7 +5,8 @@ with everything learned about the ways measurement lies. It holds rule 5 and all
 how to check your own wording, how a divergence is repaired, the only two things a number may fix
 before an operation, when to suspect the measurement rather than the form, and the specific traps
 around part boundaries, hidden surfaces, quantised readings, shallow boundaries, creases, limb
-openings, convergence loops and stencils — followed by the role of markup (§6), what is settled
+openings, convergence loops, stencils, partial rings (§5.13) and shape-preserving interpolation
+between levels (§5.14) — followed by the role of markup (§6), what is settled
 before the first polygon (§7), and what may not be settled in advance (§8). Read it before any
 operation that involves a number, and read it again whenever a mesh matches every measurement and
 still looks wrong.
@@ -317,7 +318,7 @@ grows.
 
 For a ring of a smooth tube the limit surface equals `(prev + 4·current + next) / 6`. This is not
 only a rule for checking — it is **an equation**, and it is to be solved, not approached by
-iterating the cage towards it.
+nudging the cage towards it pass after pass.
 
 A chain of rings with known targets gives a tridiagonal system; it is solved by a sweep in one pass
 and lands on the target the first time. Boundary conditions: at a free rim the limit equals the cage
@@ -328,6 +329,18 @@ Proven expensively: fitting the arm's cage to a limit-surface measurement failed
 and, over two rounds, blew a ring apart — from a half-width of 40 mm to 245. The same task solved by
 a sweep converged **on the first pass** to 0.9 mm in width and 0.4 mm in centre, across seven rings
 at once.
+
+**This is not the multi-ring convergence that beat 3 forbids.** The ban in
+[step-cycle.md](step-cycle.md), §4, beat 3 is on a **loop of successive passes** run over several
+rings —
+rings corrected through each other, pass after pass, with nobody looking in between. A sweep is a
+direct solve: the system is written once from targets already taken off the reference, solved in one
+pass, and the result is inspected before anything else happens. It is also on the legitimate side
+of §6: the targets come from the reference, and the sweep only inverts the subdivision stencil — a
+transform whose effect is known exactly. It originates no form. The sign the ban turns on — "more
+than four rings in one convergence loop" — is a sign of groping, not of arithmetic. Solving seven
+rings at once and looking at the result is allowed; nudging seven rings at once and looking at the
+numbers is not.
 
 **When groping is nevertheless needed:** if the form is not a tube and the stencil is inexact
 (unequal ring spacing, a pole nearby, a crease). Then the sweep gives the first approximation and
@@ -355,6 +368,69 @@ displacement.
 
 ---
 
+### 5.13 A partial ring's bounding box is not the section's semi-axis
+
+Around an opening — an armhole, a leg opening — a ring no longer spans a whole section. It holds
+only the arc that survived the cut. Its `max(x)` is therefore the edge of the hole, not the
+half-width of the section the ring belongs to.
+
+Any quantity derived from that `max(x)` inherits the error. Two derivations do it silently:
+
+- an **angular parameter** recovered as `cos θ = (x / a)^(n/2)` with `a` taken from the ring —
+  every vertex gets the wrong angle, and re-placing them flings the arc out to the full width;
+- a **semi-axis** for re-seating the ring — the ring is rebuilt at the size of its own remnant.
+
+Proven expensively, twice in one session. First: an angular parameter taken from a partial belt at
+the shoulder threw the armhole edge from x 76.9 to x 102.9 and lumped the whole girdle. Second,
+worse: a convergence loop seeded from the current mesh with the same defect blew a ring from a
+40 mm radius to 245 mm — the topology stayed clean the whole time, so no counter registered
+anything, and the damage was found by eye on a render.
+
+**Rule:** the semi-axis of a section comes from the **markup**, never from the ring in front of
+you. If a ring is partial, its own extent describes the hole, and the only honest source for the
+section it belongs to is the level measurement.
+
+**Violated if:** `max()` over a ring's own vertices appears in a formula that re-places those
+vertices; if a re-seating operation changes a hole's boundary that no operation asked to move.
+
+**Which side of the law.** This rule does not licence building the section from the markup. It
+governs the *verification* arithmetic of §6: when a number is taken for comparison, take it from the
+level measurement rather than from a ring that holds only part of the section. Where a ring goes is
+still found by eye on the reference.
+
+---
+
+### 5.14 A target profile is interpolated shape-preservingly, never by a natural spline
+
+Markup levels are sparse. Between them a target for width, front or back has to be interpolated —
+and the choice of interpolation is not cosmetic, because an overshoot invents form that neither the
+reference nor the markup contains.
+
+A natural cubic spline overshoots by construction: it minimises curvature globally, so it is free
+to swing outside the interval between two neighbouring data points to buy smoothness elsewhere. On
+sparse, unevenly spaced levels this happens constantly.
+
+Proven in practice: a natural cubic through the shoulder levels produced a half-width of 158.5 mm
+between neighbours of 139.5 and 143.3 — a value present in no measurement — and the shoulder came
+out lumpy. The same data through a Fritsch–Carlson monotone cubic (PCHIP), which cannot overshoot
+because it clamps the derivative at each knot to preserve monotonicity, gave a profile that passed
+inspection.
+
+**Rule:** use a shape-preserving interpolant for every profile derived from markup. If a value
+appears between two levels that is outside the range of those two levels, the interpolation
+invented it.
+
+**How to check.** For every interpolated profile, compare each sampled value against the two
+bracketing markup levels. Any excursion beyond both is an overshoot.
+
+**Which side of the law.** Interpolation here builds a **target for comparison**, not a form. The
+profile is what beat 5 gauges against between the levels the markup actually carries; it never
+becomes the wording of an operation, and it never assigns a ring its height. Used the other way —
+sampled to place rings — it is exactly the table of sections §6 forbids, and the smoothness of the
+interpolant does not redeem it.
+
+---
+
 ## 6. The role of markup
 
 Markup is an **instrument of control**, applied in two places:
@@ -364,9 +440,18 @@ Markup is an **instrument of control**, applied in two places:
    dictate where to place a ring.
 2. **During verification** — beat 5 of the step and the full verification at stage gates.
 
+**Where the line runs.** The prohibition below is on a computation that **originates a form** —
+that decides, from numbers, where the form goes. It is not a prohibition on arithmetic as such. A
+computation is legitimate when it only **inverts a transform whose effect is known exactly**: the
+target was placed by eye on the reference, and the arithmetic merely works out where the cage must
+sit for the *limit surface* to land on that target (§5.11a). The test is what supplies the target.
+Eye and reference: legitimate. A table of measurements: forbidden, however the arithmetic is
+dressed. §5.13 and §5.14 both live on the legitimate side by this test, and say so.
+
 **Forbidden:**
 
-- generating geometry from the markup by computation;
+- generating geometry from the markup by computation — that is, letting a formula decide where the
+  form goes;
 - assigning ring heights from measurement heights;
 - building guides at one per ring — that is the same table of sections, brought into the scene;
 - keeping the guides of the whole part switched on at once: the markup then works as a permanently
@@ -396,7 +481,7 @@ taken at M2 and written into the task.
 |----------|--------------------------------|
 | Assembly order and its justification | There is no single canonical order; the choice is justified by which zone of the part is the riskiest — that zone is built while the mesh is still cheapest to redo |
 | **Delivery form** | What goes out — the cage, or baked subdivision, and at which level. The hard-edge policy, the density at which form is judged, and which mesh the polygon count is taken from all depend on it |
-| **Subdivision level L** | Follows from the delivery form. The conversion of cage segments and the ring forecast depend on it |
+| **Subdivision level L** | Follows from the delivery form. It is also the factor that converts cage segments into faces on the final surface when N is checked **after** the build — not a licence to convert in advance and assign the cage a count — and the ring forecast depends on it |
 | **The girth requirement on the final surface** | Not a cage number but an acceptance criterion: at the most demanding section the final surface must carry no fewer than N faces around its girth, where N comes from the calculation in [work-rules.md](work-rules.md), R6, item 11. How many segments the cage ends up with, and when they appear, is a result of the work (§8) |
 | **The parity rule at the seam** | Any closed ring crossing the plane of symmetry must have an even number of segments: with an odd number it has no vertices on the plane itself — the seam runs through the middle of a face, the halves do not meet vertex to vertex, and the edge flow is skewed. This is a constraint **on operations**, not a number assigned in advance: a cut that produces an odd ring at the seam is forbidden |
 | Construction zones | Where the form is a stack of rings, where the part's boundaries run, and **whether a surface-turn zone exists at all**. The fact is established on the reference; a sign derived from the data only raises suspicion and requires confirmation on the reference (see [phases.md](phases.md), §16.B) |
@@ -410,7 +495,7 @@ taken at M2 and written into the task.
 | Symmetry branch | See [phases.md](phases.md), §15.1 |
 | The set of viewpoints and check channels | See [phases.md](phases.md), §11.2 |
 | Stage boundaries | See [step-cycle.md](step-cycle.md), §2.2 |
-| Iteration limits | See [step-cycle.md](step-cycle.md), §4.1 |
+| Pass limits | See [step-cycle.md](step-cycle.md), §4.1 |
 | The acceptance criterion of each phase | See [phases.md](phases.md), §9 |
 
 ---
@@ -428,7 +513,7 @@ These are results of the work. Settled in advance, they turn building into compu
 | **The place and the extent of a surface-turn zone** | These are refined at the moment of building; they are not fixed by number in advance |
 | The shape of a section inside its bounding measurement | A width × depth pair specifies an ellipse at most — one class of shape for the whole section. Flattenings inside the same bounding measurement do not follow from measurements however hard one tries |
 | The number and the places of loop cuts | The sign that one is needed is that the form has stopped responding; the sign that it is premature is that the model becomes lumpy |
-| **The number of segments around the girth** | Segments appear from cuts, and cuts are not assigned in advance (the row above). What is known in advance is only **the requirement on the result** (§7); how many segments and when is a result |
+| **The number of cage segments around the girth** | Segments appear from cuts, and cuts are not assigned in advance (the row above). What is known in advance is only **the requirement on the result** (§7); how many segments and when is a result |
 | The placement of poles | A pole is a consequence of how the edge flows actually met; one designed in advance will have to be moved |
 | Concavities | Concavities cannot be recovered from two orthographic silhouettes **in principle**: a concavity does not affect the silhouette. Two views give the convex hull at best |
 | Places where the surface turns under itself | At such a height the cutting plane is either tangent or gives two separate contours. That class of shape is structurally inaccessible to horizontal sections |

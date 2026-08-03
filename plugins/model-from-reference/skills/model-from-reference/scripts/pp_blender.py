@@ -1046,8 +1046,13 @@ ANGLES.update({
 # The mandatory set for checking a ring edit: the gauge from two views, the
 # section's shape from above, and an orbit. Without the top view the section is
 # invisible from every angle, and a box lives on where an oval was intended.
+# Набор кадров такта 4: три ортогональных + облёт = четыре обязательных
+# ракурса (phases.md, §11.1). Вид сзади в него не входит — он добавляется
+# только к проверке шва (ПРОВЕРКА_ШВА), где нужен агенту по вершинам.
 ПРОВЕРКА_КОЛЬЦА = ("сверху", "спереди", "справа")
 RING_CHECK = ПРОВЕРКА_КОЛЬЦА
+ПРОВЕРКА_ШВА = ("спереди", "сзади", "сверху")
+SEAM_CHECK = ПРОВЕРКА_ШВА
 ОБЛЁТ = tuple(("облёт_%d" % a, (68, 0, a)) for a in (0, 60, 120, 180, 240, 300))
 ORBIT = ОБЛЁТ
 

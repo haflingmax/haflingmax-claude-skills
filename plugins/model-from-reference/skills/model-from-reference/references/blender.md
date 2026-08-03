@@ -52,8 +52,8 @@ The beats come from the regulation — see [step-cycle.md](step-cycle.md), §4.
 
 **The rule of economy.** Everything that does not require my eye between calls goes into **one**
 `execute_blender_code` block. A separate call is justified only where the next action depends on
-what I saw. With three view angles per step that comes to **five** calls to the server, not
-fourteen.
+what I saw. With the four mandatory view angles (see [phases.md](phases.md), §11.1)
+that comes to **seven** calls to the server, not fourteen.
 
 | Beat | What performs it | Calls |
 |------|-----------------|-----------|
@@ -181,8 +181,8 @@ The catalogue itself is in [phases.md](phases.md), §10.1.
 
 | Operation of the regulation | What does it | What checks it |
 |---------------------|--------------|-----------------|
-| Set up mirroring | the `"MIRROR"` modifier, `use_axis`, `use_clip`, `use_mirror_merge`, `merge_threshold`; **mandatory** `mirror_object` (6.1). Created **first**, before subdivision | `pp.mods()["отражение_раньше_сглаживания"]` (mirror before subdivision), `pp.seam()` |
-| Engage subdivision | `"SUBSURF"`, `subdivision_type="CATMULL_CLARK"`, **`levels == render_levels == L`**; inequality is forbidden: the gauge is taken at the viewport level, and if the two diverge it was not taken off the render | `pp.mods()["уровни_показа_и_выдачи_равны"]` (viewport and render levels equal); `pp.budget()["множитель"]` (multiplier) = **2 × 4^L** with a mirror in the stack and 4^L without it — verified: cage 48 → final 384 |
+| Set up mirroring **(M1, not a step)** | the `"MIRROR"` modifier, `use_axis`, `use_clip`, `use_mirror_merge`, `merge_threshold`; **mandatory** `mirror_object` (6.1). Created **first**, before subdivision | `pp.mods()["отражение_раньше_сглаживания"]` (mirror before subdivision), `pp.seam()` |
+| Engage subdivision **(M3, not a step — L comes from M2)** | `"SUBSURF"`, `subdivision_type="CATMULL_CLARK"`, **`levels == render_levels == L`**; inequality is forbidden: the gauge is taken at the viewport level, and if the two diverge it was not taken off the render | `pp.mods()["уровни_показа_и_выдачи_равны"]` (viewport and render levels equal); `pp.budget()["множитель"]` (multiplier) = **2 × 4^L** with a mirror in the stack and 4^L without it — verified: cage 48 → final 384 |
 | Create the primary volume | `bmesh.ops.create_cube` into a new mesh; **the object's origin on the plane of symmetry** | screenshot: fits inside the zone's contour; `pp.bbox()` |
 | Cut the primary volume up to load-bearing density | `bmesh.ops.subdivide_edges` | `pp.budget()`, a screenshot of the envelope |
 | Continue the shell | `bmesh.ops.extrude_face_region` + `translate`; the ring's scale via `bmesh.ops.scale`. **The source faces must be deleted** — see 6.20 | `pp.section()` at the coordinate of the **nearest measurement**; `pp.topology()["итог_рёбер_с_3+_гранями"] == 0` (final: edges with 3+ faces) |
@@ -232,10 +232,24 @@ all three and change them as a side effect.
 | Quads only | `pp.topology()["n_угольников"] == 0` with addresses | ✓ a clean cage: 48 quads, 0 others; a broken one: 2 heptagons with addresses |
 | Zero open edges | `pp.topology()["итог_открытых_рёбер"]` | ✓ the half's cage has 16 open, the final after mirroring 0 |
 | Stack order and equality of levels | `pp.mods()` | ✓ order and levels are read; when the levels diverge, `evaluated` fails |
-| Transforms not baked in | `pp.mods()["стек"]` (stack) — MIRROR and SUBSURF still there | ✓ |
+| Transforms not baked in — **cage delivery form only** | `pp.mods()["стек"]` (stack) — MIRROR and SUBSURF still there | ✓. In the baked-subdivision form decided at M2, SUBSURF is applied at M6 and this check inverts: the stack is empty and the polygon count is the baked one |
 | Polygon count against the range | `pp.budget(ob, share=(min, max))["вердикт"]` (verdict) | ✓ 768 out of (200, 800) → "near the upper bound", 32 to spare |
 | Full comparison against the markup | `pp.gauge()` — empty and turn are counted separately | ✓ three levels gave three different outcomes: in tolerance, turn, empty |
 | The contents of the scene, R1 | `get_objects_summary` | ✓ |
+
+### 4.4 M6 — delivery
+
+[phases.md](phases.md), M6 hands the part over in the delivery form decided at M2. The cage form
+needs no operation: the stack stays as it is. The baked form needs one, and it is the only bake in
+the whole build.
+
+| Operation of the regulation | What does it | What checks it |
+|---------------------|--------------|-----------------|
+| Bake subdivision at level L | `bpy.ops.object.modifier_apply(modifier="SUBSURF")` with the object active and selected; mirroring is applied first, so the halves are one shell before the surface is frozen | `pp.mods()["стек"]` is empty; `pp.topology()` — quads only, zero open edges; `pp.budget()` on the baked mesh, since the multiplier no longer applies |
+| Take the polygon report | `pp.budget(ob, share=(min, max))` **off the result of the transforms**, never off the cage | the verdict is inside the part's share of the R2 range |
+
+Baking earlier than M6 is a violation of the phase, not a shortcut: it removes the ability to
+re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
 
 ### 5.1 Perception channels
 
@@ -418,8 +432,18 @@ of the same view angles, taken **through different channels**:
 
 | Pass | Channel | Angles |
 |-------|-------|---------|
-| Surface | `pp.channel("затенение")` | `pp.ПРОВЕРКА_КОЛЬЦА` + `pp.orbit()` |
-| Mesh | `pp.channel("каркас")` | the same |
+| Surface | `pp.channel("затенение")` — the flow of the surface | `pp.ПРОВЕРКА_КОЛЬЦА` + `pp.orbit()` |
+| Surface | `pp.channel("кривизна")` — continuity of curvature | the same |
+| Surface | `pp.channel("силуэт")` — **the only channel a contour may be judged on** (§6.26) | the same |
+| Surface | `pp.channel("рабочий")` — the model over the reference | front and profile |
+| Mesh | `pp.channel("каркас")` | the same as the surface pass, orbit included |
+
+Three judging channels for the surface, not one — silhouette, shading and curvature. The fourth
+Surface row, the working overlay, is how the reference is attached, not a channel the form is
+judged on. Shading alone cannot answer the question beat 4 asks: a
+curvature break at zero positional error is invisible on a diffuse material and reads immediately on
+a striped one, and the contour measured in shading is the boundary of the lighting rather than of
+the form. Switch the guides off before the mesh pass — §6.23б.
 
 The screenshots are reviewed by **separate agents with precise questions**, not by one general
 look:
@@ -706,6 +730,22 @@ along its whole length that at least half a ring's spacing is left to the neighb
 the tip not by overshooting the cage but with a **crease on the edges** — a crease is local,
 whereas rings closing on each other acts along the whole circuit.
 
+**A second instance, from horizontal rings only.** The crossing of a slanted loop is not the only
+way to arrive here. A ladder of ring spacings that steps down abruptly does the same thing without
+any loop being slanted at all.
+
+Verified: at the shoulder girdle the spacings ran 25.5 mm, then **7.5, then 7.5** — the last three
+rings before the top. That pair of short spans behaves exactly like a deliberate supporting pair
+and held a hard edge along the shoulder. It was diagnosed the long way round: the meridians there
+broke their slope of x against z by −0.60, −1.22 and −1.87 and then recovered by +0.33, +0.65 and
++0.94 one ring higher, which reads as a crease and not as form. Regrading the ladder to a monotone
+37, 34, 31, 28, 25, 22, 13, 10 removed it.
+
+**The sign, generalised:** read the ladder of spacings before blaming the shape. A ratio jump
+between neighbouring spans — 25 to 7.5 is more than three times — is a supporting pair whether or
+not you meant to make one. The same check catches the opposite defect: a jump of 24 → 53 leaves a
+span with nothing to hold it, and the surface sags across it.
+
 ### 6.33 Equal arc computed for each ring separately skews the meridians ✓
 
 A ring is laid onto an ellipse by its front, back and width, distributing the vertices by equal
@@ -826,7 +866,7 @@ is assembled by reading the file, not from memory.
 | `mods`, `bbox`, `seam`, `topology`, `budget`, `gauge`, `guide`, `view`, `channel`, `shots`, `snapshot`, `points`, `restore` | a run on the probe: a clean half-cube with a mirror, and a torus about Y |
 | The tools stay silent on clean geometry | a clean cage: 0 n-gons, 0 triangles, 0 open edges after mirroring, 0 poles on the seam |
 | The tools shout on a broken one | a probe with degenerate caps: 2 heptagons, 4 edges with 3+ faces, 4 doubled seam vertices — all with addresses |
-| The legitimate degree of a seam vertex is three | a clean seam of 16 vertices gave 0 poles under the rule "a pole is degree ≠ 3" |
+| The legitimate degree of a **seam** vertex is three | a clean seam of 16 vertices gave 0 poles under the rule "on the seam, a pole is degree ≠ 3". This threshold applies **only to vertices lying on the mirror plane of a half cage**: such a vertex has two edges along the seam and one going inward, and the mirror supplies the fourth. Off the seam the ordinary rule holds — a pole is valence ≠ 4 |
 | A mirror doubles the polygon count on top of subdivision | cage 48 → final 384, multiplier 8 = 2 × 4¹ |
 | `evaluated` fails when the levels have diverged | `RuntimeError` at `levels=2`, `render_levels=1` |
 | `cage` fails on the wrong type | `TypeError` on an empty |

@@ -88,7 +88,7 @@ is too coarse to be a step; it is 3–6 steps.
 at once and the hand reaches to fix them in one pass. The reason not to is not tidiness — it is
 that inspection answers "what is wrong *in this zone*". Change three zones in one pass and a
 finding cannot be traced to its cause; rollback loses meaning, and the fix loop stops converging
-because every iteration changes the conditions for its neighbours.
+because every pass changes the conditions for its neighbours.
 
 ## The six-beat cycle
 
@@ -209,18 +209,29 @@ Do not perform an operation whose location can be found from a table of measurem
 guide object, a zone or level number, or a fraction of the part's height. Rewrite the wording first.
 
 Do not run beat 4 with fewer than four viewpoints — front, side, top, orbit — and fewer than three
-channels — shading, reflective, and the cage over the smoothed result — plus a close-up of the zone.
+surface channels — silhouette fill, smooth shading, and the reflective channel — plus the cage over
+the smoothed result and a close-up of the zone. The canonical sets live in phases.md §11.1 and
+§11.2. A contour is judged on the silhouette channel and on no other.
 
 Do not send a zone to inspection without the reference attached.
 
-Do not close a step on measurements. A step closes when three separate looks find nothing in the
-affected zone.
+Do not close a step on measurements, and do not close it on the inspection alone. All four must
+hold: the fix loop has closed, meaning none of the three looks names a defect in the affected zone;
+the form has been taken as far as this density allows; the operation's own check has passed; and any
+remaining divergence is either inside the form tolerance set at M2 — never the tighter measurement
+tolerance the reference was read with — or explained by density and written into
+the journal with its number.
 
 Do not gauge off the cage. Take the reading from the final surface, with subdivision applied.
 
-Do not run a convergence loop over more than four rings, or over a height range spanning more than
-one form feature. Do not apply a formula — scale, projection, a per-height factor — over geometry
-the step's operation did not change.
+Do not run a convergence *loop* over more than four rings, or over a height range spanning more than
+one form feature. This bans groping, not arithmetic: a closed-form solve — inverting the subdivision
+stencil for a chain of rings whose targets the eye has already placed — is not a loop and is not
+limited by ring count. Prefer it exactly because it does not iterate.
+
+Do not apply a formula — scale, projection, a per-height factor — over geometry the step's operation
+did not change, and never let a formula originate a form. A computation may undo a transform whose
+effect is known exactly; it may not decide where the form goes.
 
 Do not begin a second form feature before the first is closed.
 
@@ -233,7 +244,7 @@ ring has no vertex on the plane, the halves do not meet, and the flow skews.
 Each of these was hit, diagnosed and written down; the section reference says where the full
 account lives.
 
-- **A partial ring's bounding box is not the section's semi-axis** — [measure-vs-eye.md](references/measure-vs-eye.md) §5.12.
+- **A partial ring's bounding box is not the section's semi-axis** — [measure-vs-eye.md](references/measure-vs-eye.md) §5.13.
   Around an opening (armhole, leg opening) a ring holds only part of the section. Deriving an
   angular parameter or a semi-axis from `max(x)` over that ring throws vertices to the full width.
   This broke a mesh twice in one session — once blowing a ring from a 40 mm radius to 245 mm.
@@ -246,7 +257,9 @@ account lives.
 - **A stencil is inverted, not groped for** — [measure-vs-eye.md](references/measure-vs-eye.md) §5.11a.
   For a tube's ring, the limit surface equals `(prev + 4·current + next) / 6`. That is an equation:
   a chain of rings with known targets is a tridiagonal system, solved in one sweep. Groping at it
-  with iterations failed three times; the sweep landed seven rings at once, first try, to 0.9 mm.
+  pass by pass failed three times; the sweep landed seven rings at once, first try, to 0.9 mm.
+  The targets came from the reference and the solve only undid the stencil — it originated no form,
+  and being a solve rather than a loop, the four-ring gate does not bind it.
 - **A push that does not move the surface means something else holds that height** —
   [measure-vs-eye.md](references/measure-vs-eye.md) §5.12. Not "push harder". Find which vertex is
   actually outermost there first. Four passes of pushing grew a spike the subdivision then ate,
@@ -259,9 +272,9 @@ account lives.
 - **A supporting-loop pair made by accident** — [blender.md](references/blender.md) §6.32. Ring
   spacings of 25 mm, then 7.5, then 7.5 hold a hard crease. Read the ladder of spacings before
   blaming the shape.
-- **Interpolate profiles shape-preservingly** — a natural cubic spline through sparse markup levels
-  overshoots; it put a 158 mm half-width between neighbours of 139 and 144 and lumped a shoulder.
-  Fritsch–Carlson (PCHIP) does not overshoot.
+- **Interpolate profiles shape-preservingly** — [measure-vs-eye.md](references/measure-vs-eye.md) §5.14.
+  A natural cubic spline through sparse markup levels overshoots; it put a 158.5 mm half-width
+  between neighbours of 139.5 and 143.3 and lumped a shoulder. Fritsch–Carlson (PCHIP) cannot.
 - **Keep guides on for the working zone only** — [measure-vs-eye.md](references/measure-vs-eye.md) §6.
   All guides visible at once turns the markup into a permanently open table, and verification
   quietly becomes construction.
@@ -277,5 +290,6 @@ Read the file that matches what you are about to do. Do not read all of them.
 | [work-rules.md](references/work-rules.md) | Starting a project: empty scene, polygon budget from purpose, one part per iteration, scene setup for the reference, per-part metrics, markup — how it is produced and handed off — and choosing the method |
 | [phases.md](references/phases.md) | Planning a build, or standing at a phase boundary: M1–M6 including part acceptance and the joint contract, the operation catalogue, perception channels, the density test, budget exhaustion, input data changing mid-work |
 | [blender.md](references/blender.md) | Working in Blender: how each operation maps to tools, the session toolkit, the executable two-pass inspection procedure, and 36 traps, 26 of them verified against the source |
+| [rule-process.md](references/rule-process.md) | Writing a rule, changing one, or extending this skill to a work type it does not cover: the rule lifecycle and statuses, the sub-step cycle the other files refer to, what makes a rule checkable, and the template |
 | `scripts/pp_blender.py` | The session toolkit — rings by connectivity, reference pixel measurement, frame scale, perception channels, orbit, topology counters. Import it once per session; it survives across calls. |
 | `/model-review`, and the three inspector agents | Beat 4, already implemented: the command renders the mandatory frame set and dispatches `surface-inspector`, `edge-flow-inspector` and `vertex-inspector` with the reference attached |

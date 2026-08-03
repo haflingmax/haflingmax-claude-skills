@@ -18,9 +18,10 @@ two-dimensional reference (concept art, photograph, orthographic views).
 particular model. Everything that belongs to one specific model (its list of parts, its
 proportions, its budget in numbers) lives in the task, not here.
 
-The process for working with the rules themselves — their lifecycle, statuses, the requirements on
-how a rule is worded, the template for a new rule — is common to the whole rule set and is not
-reproduced here.
+The process for working with the rules themselves — their lifecycle and statuses, the requirements
+on how a rule is worded, the template for a new rule, and the sub-step cycle the rules below refer
+to — is common to the whole rule set and lives in [rule-process.md](rule-process.md). The status
+vocabulary used below (`draft`, `under verification`, `approved`, `rejected`) is defined there.
 
 ---
 
@@ -285,8 +286,14 @@ It is computed from the 2D reference, separately for each part:
 1. Find the **mandatory sections** along the contour — the extrema and inflection points of the
    silhouette, that is, the places where the form changes character. Their number is
    `N_сечений` (N_sections).
-2. Determine the minimum number of **segments around the girth**: 8 for organic forms with free
-   rotation, 6 with limited viewing angles (B5), 4 for faceted and technical forms.
+2. Determine the **floor for faces around the girth on the final surface**: 8 for organic forms
+   with free rotation, 6 with limited viewing angles (B5), 4 for faceted and technical forms.
+   The floor is counted in the same unit as N — faces on the final surface, not cage segments —
+   which is what makes the two comparable at all.
+   This is a coarse constant per class of object, and it feeds the minimum estimate below. It is
+   **not** the girth requirement N, which is computed for each part separately from its own measured
+   section (R6, item 11) and is normally several times larger — on a torso the calculation gave
+   about 32 against a floor of 8. A part that satisfies the floor and fails N is not acceptable.
 3. Estimate the minimum from the number of places where the form changes character and from the
    smoothness required around the girth. How the estimate is made depends on the method and lives
    in the method's document: for box modelling, see [phases.md](phases.md), M2 item 4. The "stack
@@ -570,7 +577,7 @@ Width and depth are taken **at the same level**: the band is shared by the two v
 taken at different heights do not form a section, and there is nothing to build a volume from.
 
 **Levels are grouped into vertical segments.** A height segment is a block of the part (head, neck,
-chest), and the levels that fall into it are its rings. The grouping is not there for tidiness in
+chest); a level belongs to the block whose height range contains it. The grouping is not there for tidiness in
 the list: it defines the **zones of comparison and the measurement coverage of the part**. The
 build order is not determined by the grouping — that belongs to the method's document.
 
@@ -648,8 +655,9 @@ written.
 11. **Feed the measured bounding measurements back into R2.** This part's share of the budget is
     recomputed from the measured dimensions instead of the assumed ones.
     - A section is treated as an **ellipse** built from the width–depth pair at one level. The
-      number of segments around the girth is taken **by integrating around the perimeter with the
-      local curvature**, not from a single radius: an ellipse's curvature varies from `b²/a` to
+      girth requirement **N** — the number of **faces around the girth on the final surface**, never a
+      count of cage segments (see [phases.md](phases.md), M2 item 3) — is taken **by integrating
+      around the perimeter with the local curvature**, not from a single radius: an ellipse's curvature varies from `b²/a` to
       `a²/b`, and computing from the sharpest radius overstates the mesh by roughly a tenth.
     - **Gauges of internal features (see item 5) do not enter the section calculation.** The pair
       "chin width — neck depth" gives an ellipse the part does not have.
@@ -695,7 +703,7 @@ arms. Four findings, all folded into the procedure:
 - **R6 feeds data back into R2.** The polygon minimum had been computed from an assumed torso
   radius of 150 mm. Measurement gave an ellipse with semi-axes 174 × 104 at pelvis level, for which
   the governing radius of curvature is `ρ = b²/a = 62 mm`, not 150. The torso needs ~32
-  segments around the girth instead of 48 — that is, **the minimum had been overstated**. Hence
+  faces around the girth on the final surface instead of 48 — that is, **the minimum had been overstated**. Hence
   item 11.
 
 ---
@@ -779,8 +787,8 @@ three "errors" in the first markup turned out to be measurements I had not antic
 #### How to accept
 
 1. Every finding has been dealt with: fixed or explained by the author.
-2. The blocks cover the part without holes (checked by union), each block has at least two rings,
-   and every level is assigned to a block — explicitly where several blocks fit.
+2. The blocks cover the part without holes (checked by union), each block has at least two gauged
+   levels, and every level is assigned to a block — explicitly where several blocks fit.
 3. Dimensions of internal features of the form are labelled (R6, item 5).
 4. The file is marked finished, and a copy has gone into the history.
 5. Only after that — the measurements are fed back into R2 and building proceeds under R3.
@@ -832,7 +840,7 @@ not change its nature: **markup is a tool for controlling proportions, not a gen
 |-----------------|------------------------|----------------------|
 | Model's surface | large smooth forms, no fine relief | folds, pores, fabric, musculature |
 | Polygon budget | low: the result will be sparse anyway | high, or there is a normal map |
-| Transferring detail into a map (C4) | not planned | planned — sculpting's main gain |
+| Transferring detail into a map | not planned | planned — sculpting's main gain |
 | Deformation (C1) | hinged or static | skinning with complex zones |
 | Priority (D2) | accuracy of silhouette and bounding measurements | plasticity of the surface |
 | Measured markup available | yes: the markup gives bounding measurements and boundaries to compare against, and the form is built by eye | not required |
@@ -869,6 +877,16 @@ on the editor. For box modelling that regulation is
 [phases.md](phases.md); the mapping of its operations onto one editor's tools is
 [blender.md](blender.md).
 
+| Method | Regulation | State |
+|--------|------------|-------|
+| Box modelling | [step-cycle.md](step-cycle.md) + [measure-vs-eye.md](measure-vs-eye.md) + [phases.md](phases.md), mapped to Blender by [blender.md](blender.md) | `draft` — assembled from sources and a review of three failed attempts, then applied to a real build; no build has yet been carried from first setup to delivery under it. Statuses are defined in [rule-process.md](rule-process.md) |
+| Sculpting with retopology | none | not written |
+
+**This matters when the recommendation goes the other way.** R8 presents both methods as genuine
+alternatives, and if the answers point at sculpting with retopology there is no regulation here to
+hand the work to. Say so plainly rather than steering the choice back to the method that happens to
+be documented — a method chosen because its rules exist is not a method chosen on the evidence.
+
 R8 ends with the choice of method and hands the work to the first phase of the chosen regulation.
 
 ---
@@ -896,6 +914,7 @@ These are **not rules**, but a list of what the rules have to prevent.
 | A12 | **Destroying someone else's result** | Cleaning up after myself touches files and state that hold a person's work: deleted markup, cleared browser storage, an overwritten file. |
 | A13 | **Method chosen in hindsight** | Building started without an explicit choice of method. The first hundred polygons have already set the topology and the order of work, and the choice turned out to have been made silently. |
 | A14 | **Form treated as a function of height** | A part is built as a stack of horizontal sections: one height, one ring. But the form has turns — under the jaw, under the chest, in the armpit — where there are two surfaces at one height. A stack of rings does not describe them **at any number of rings**. Measurements that do not fit the picture are then declared markup errors. |
+| A15 | **Form imposed by a formula over the whole mesh** | Scale, projection, a per-height correction factor — applied to geometry the current operation did not change. A formula deforms form that already exists without creating new form: you cannot get an oval from a square by scaling. The bounding measurements agree anyway, because a square and an oval of the same width and depth measure the same, so the check passes and the defect ships. Its disguised variant is a convergence loop run over several rings at once: every ring has its own target from the reference, vertices are placed one at a time, and still nobody looks between passes. What this refusal bans is the loop, not the arithmetic: a direct solve that inverts a known transform onto targets taken from the reference originates no form and is not caught by it (see [measure-vs-eye.md](measure-vs-eye.md), §5.11a and §6). Cited by [step-cycle.md](step-cycle.md), §4, beat 3. |
 
 ---
 
@@ -934,10 +953,15 @@ the queue is not a priority.
       *Partly covered in [step-cycle.md](step-cycle.md), §13–14; a general rule is still needed.*
 - [ ] How the final mesh is obtained: control cage + subdivision, or direct modelling at final
       density. Moved out of R2 — it does not affect the polygon range.
+      *For box modelling this is settled: it is the delivery form, decided and recorded at M2 (see
+      [phases.md](phases.md), M2 item 5) and checked at M6. What is still open is the general rule
+      across methods.*
 - [ ] LOD levels: are they needed, how many, how each is computed.
 - [ ] Transferring detail into a normal map: when it is justified, what gets baked.
 - [ ] UVs and textures: unwrapping, seams, the effect on the final vertex count.
 - [ ] Export format: glTF / USDZ / FBX, triangulation, format limits.
+      *Feeds the M2 delivery-form decision: whether the format carries edge creases decides
+      whether creases are usable at all (see [measure-vs-eye.md](measure-vs-eye.md), §7).*
 - [ ] Shape keys and deformation: when they are needed, which edge loops they require.
 - [x] ~~Mapping the regulation's operations onto the tools of a specific editor.~~
       [blender.md](blender.md) has been written for Blender.
@@ -954,7 +978,7 @@ the queue is not a priority.
 | 2026-07-30 | R2 reworked: instead of "the budget comes from the task", the rule now **derives the range [min, max]**. Added the questionnaire (blocks A–D), the method of computing the minimum from the 2D reference, the method of computing the maximum from purpose, and the requirement of visual confirmation of the minimum. |
 | 2026-07-30 | R2 narrowed to its own job. Six questions that do not determine the polygon count were removed from the questionnaire: runtime subdivision, LOD, normal map, UV/textures, export format, shape keys — moved into the queue in §3 as separate rules. An explicit boundary for the questionnaire was added. The range now applies to the final mesh that ships to the application, regardless of how it was obtained. 15 questions remain. |
 | 2026-07-30 | R2 applied, status `under verification`. From the results of that application, question A6 was added to the questionnaire — whether the model is rendered at the same time as the camera/ARKit/ML: a missed input that halves the frame budget and without which the ceiling cannot be computed. The answers and the calculation are kept in the project's task. |
-| 2026-07-30 | The rules were moved into a separate `work-rules` repository. The common process (rule lifecycle, statuses, wording requirements, template) was moved to the repository's README, and the file's sections were renumbered. |
+| 2026-07-30 | The rules were moved into a separate `work-rules` repository. The common process (rule lifecycle, statuses, wording requirements, template) was moved out of this file, and the file's sections were renumbered. It now lives in [rule-process.md](rule-process.md); the repository README that first held it is archived. |
 | 2026-07-30 | R4 added — the first part is chosen as the model's base, with five criteria for how much it anchors and a mandatory analysis of the alternatives. Failure mode A8 added (no base part). |
 | 2026-07-30 | R6 added — reference levels and bounding measurements, and failure mode A10 (proportions by eye). |
 | 2026-08-01 | Eleven unverified toolkit functions were run through a live session in four calls. The check ran both ways: on clean geometry the tools must stay silent; on broken geometry they must name addresses. A clean half of a cube with a mirror gave 48 quads, zero open edges after reflection and zero poles on the seam — this confirmed the rule that "the legal degree of a seam vertex is three". A torus with its axis along Y gave two contours through the hole and one below it, and gauging on it separated three outcomes: normal, turn, empty. Two new facts were found: the mirror doubles the polygon count on top of subdivision, so the multiplier is 2 × 4^L rather than 4^L; and rollback silently makes the rollback point itself the working file — subsequent saves would have gone into the directory of rollback points. The second was fixed: `restore` now takes the path of the working file. The scene, the collections and the working file were returned to their original state after the run. |
@@ -976,3 +1000,5 @@ the queue is not a priority.
 | 2026-07-30 | R5 applied and **approved**. From the results of the trial the procedure grew from 8 steps to 10: judging the reference's fitness became numeric, and separate normalisation of the views plus an instrumental check of placement by measuring a screenshot were added. An interaction with R1 was noted: "exactly one camera" forces the camera's viewport display size to be shrunk and the check renders to be taken with a single camera. |
 | 2026-07-30 | An exception was added to R1: an untouched editor startup file (`is_dirty == False`, default contents) is cleaned without asking for confirmation. The inventory is published as before. |
 | 2026-07-30 | R4 applied and **approved**. From the results of the trial, a resolution for conflicting criteria was added: criterion 2 (unambiguous boundaries) is eliminating and the rest are comparative — otherwise the choice between a candidate with more adjacencies and a candidate with unambiguous boundaries is arbitrary. |
+| 2026-08-03 | The rules became the `model-from-reference` plugin; this file is the work-type layer of its skill. The common process was written up as [rule-process.md](rule-process.md), which until then was referenced but never defined. Failure mode **A15** added — form imposed by a formula over the whole mesh — from a build in which a convergence loop blew a ring from a 40 mm half-width to 245 mm. R8 gained the method registry table. |
+| 2026-08-03 | Terminology unified across the whole rule set, one decision per axis, after an audit found the same word carrying two meanings in different files. **Girth:** "segments" now always means the control cage and "faces" always means the final surface — so the requirement N and the R2 floor of 8/6/4 are both counted in faces on the final surface, and R6 item 11 and the trial finding of 2026-07-30 were restated in that unit. **Tolerances:** two, never three — the measurement tolerance the reference was read with (R6, item 8) and the wider form tolerance set at M2; a step closes on the second. **Levels:** R6 and R7 say "level" for a place of comparison in the markup and reserve "ring" for the mesh. **Iteration** keeps its R3 sense of one part's pass through the phases; a repetition inside a fix loop is a "pass". **Statuses** are defined once, in rule-process.md. Why: a word that means two things in two files is a rule that cannot be followed, and every one of these had already produced a wrong build decision. |
