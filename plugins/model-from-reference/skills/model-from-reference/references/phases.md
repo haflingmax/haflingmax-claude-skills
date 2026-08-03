@@ -191,7 +191,7 @@ boundaries and limits are named.
 
 **Done when:** zones are marked out by form features, the delivery form and the level L that
 follows from it are recorded, the form tolerance is assigned, policies are assigned, the forecast fits the range, stage boundaries
-and limits are named, the plan is approved.
+limits and the list of excluded measurements are named, the plan is approved.
 **Violated if:** the function-of-height check was not performed; the delivery form was left
 undecided while L was assigned anyway; the plan assigns a cage segment
 count or a ring count as a decomposition of the mesh;
@@ -199,7 +199,8 @@ ring heights or section bounding measurements have appeared in the plan **in any
 name** — forecast, reference figure, zone boundaries, guideline.
 The only numbers admissible in the plan: the part boundaries, the part's overall bounding
 measurement, the required number of faces around the girth at the most demanding section (N), the
-subdivision level L, the form tolerance, the limits of item 7, the bounds of the polygon range, the one-number-per-part polygon forecast of
+subdivision level L, the form tolerance, the limits and the list of excluded measurements of item
+7, the bounds of the polygon range, the one-number-per-part polygon forecast of
 item 4, and a total ring forecast not tied to heights.
 
 ### M3 — Blockout: volumes

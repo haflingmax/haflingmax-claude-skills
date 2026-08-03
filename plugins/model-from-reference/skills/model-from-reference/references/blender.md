@@ -250,7 +250,7 @@ re-shape the proportions in one movement (see [phases.md](phases.md), §16.A).
 | Stack order and equality of levels | `pp.mods()` | ✓ order and levels are read; when the levels diverge, `evaluated` fails |
 | Transforms not baked in — **cage delivery form only** | `pp.mods()["стек"]` (stack) — MIRROR and SUBSURF still there | ✓. In the baked-subdivision form decided at M2, SUBSURF is applied at M6 and this check inverts: the stack is empty and the polygon count is the baked one |
 | Polygon count against the range | `pp.budget(ob, share=(min, max))["вердикт"]` (verdict) | ✓ 768 out of (200, 800) → "near the upper bound", 32 to spare |
-| The girth requirement N (the M5 gate) | `pp.section()` at the most demanding level, counting the faces around the resulting contour **on the subdivided result**, never on the cage; compared against N from M2, item 3 | ✓ a cage of 48 segments at L = 1 gives 96 faces around the girth, against N = 32 |
+| The girth requirement N (the M5 gate) | `pp.section()` at the most demanding level, counting the faces around the resulting contour **on the subdivided result**, never on the cage; compared against N from M2, item 3 | ✓ a cage of 48 segments at L = 1 gives 96 faces around the girth, against N = 32. The multiplier here is **2^L**, not the 4^L of §9: subdivision halves each edge, so a count taken *around* a ring doubles per level, while a count over an *area* quadruples. Different dimensions, different exponent — do not carry one over to the other |
 | Full comparison against the markup | `pp.gauge()` — empty and turn are counted separately | ✓ three levels gave three different outcomes: in tolerance, turn, empty |
 | The contents of the scene, R1 | `get_objects_summary` | ✓ |
 
@@ -446,11 +446,10 @@ of the same view angles, taken **through different channels**:
 
 Four judging channels for the surface, not one. Shading gives the flow, curvature the continuity,
 the silhouette the contour, and the working overlay puts the art in the same frame. Shading alone
-cannot answer beat 4's question: a curvature break at zero positional error is invisible on a
-diffuse material, and the contour measured in shading is the boundary of the lighting. Shading alone cannot answer the question beat 4 asks: a
-curvature break at zero positional error is invisible on a diffuse material and reads immediately on
-a striped one, and the contour measured in shading is the boundary of the lighting rather than of
-the form. Switch the guides off before the mesh pass — §6.23б.
+cannot answer the question beat 4 asks: a curvature break at zero positional error is invisible on
+a diffuse material and reads immediately on a striped one, and the contour measured in shading is
+the boundary of the lighting rather than of the form. Switch the guides off before the mesh pass —
+§6.23b.
 
 The screenshots are reviewed by **separate agents with precise questions**, not by one general
 look:

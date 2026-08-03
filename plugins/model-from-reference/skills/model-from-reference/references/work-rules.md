@@ -652,7 +652,9 @@ written.
      out;
    - for comparison against **one side** — the same plus the measured asymmetry from item 7. Such a
      comparison is inherently weaker and is used only when the full bounding measurement is
-     unavailable.
+     unavailable. Its consumer is the markup-against-reference check, R7 check 8, where a limb or a
+     cropped edge leaves only one side readable — not the model-against-art comparison, which runs
+     on the form tolerance whichever side is available.
 **A note on the word "segment".** In this rule it means a **drawn line on the markup picture** —
 the horizontal stroke of the measured length at a level. That is a different thing from a **cage
 segment**, an edge of a ring on the control cage, which is what "segments around the girth" always
@@ -786,7 +788,7 @@ The checks are run by script, all at once, before any conclusions:
 | 6 | Coverage of the part | the union of the blocks leaves holes; check by union, not by sum — blocks may overlap |
 | 6a | Level membership | a level falls into no block; a block holds fewer than two gauged levels — the block gives no comparison |
 | 7 | Axis consistency | the midpoint offset does not match the axis for the dimensions bound to it |
-| 8 | Comparison against the reference | its own width against the part's width and against the full silhouette |
+| 8 | Comparison against the reference | its own width against the part's width and against the full silhouette, within the **measurement** tolerance — this is markup against reference, not model against art |
 
 #### How to present findings
 
@@ -1012,7 +1014,7 @@ the queue is not a priority.
 | 2026-07-31 | R7 added — markup: what to start up, what to ask, what to check, how to accept. Eight checks on the returned markup, the division of findings into observations and probable errors, and the prohibitions on acting during someone else's work. Failure modes A11 (markup instead of the author) and A12 (destroying someone else's result) added. |
 | 2026-07-31 | R6 applied to the first part in full. Added: a label is mandatory for gauges of internal features of the form (otherwise they are indistinguishable from a miss — a chin 36.9 mm wide against a silhouette of 100.3 looked like a defect); a section is treated as an ellipse with an integral around the perimeter rather than a single radius; gauges of internal features are excluded from the section calculation; the level count is taken from the levels that were placed — a count of places to compare at, not a ring quota (R6, item 11). The minimum for the central block was recomputed: 1 800 → 2 484 tris. |
 | 2026-07-30 | R6 refined during application: width and depth are taken at a common level (otherwise there is no section); the section "The status of the metrics" was added — metrics from a 2D reference are advisory, the reference is a support for proportions but not a one-to-one standard, and presenting them as mandatory to reproduce exactly is forbidden. |
-| 2026-07-30 | R6 applied and **approved**. The procedure grew from 8 steps to 12. Findings: drawn joint lines are unreliable as a source of levels on a rendered reference (shading gives equally dark pixels); joint lines cut the mask of the figure and require gaps to be closed; the reference's own asymmetry turned out to be four times the tolerance, hence the requirement to compare full bounding measurements rather than half-widths; measured bounding measurements are fed back into R2 — an assumed torso radius of 150 mm turned out to be an ellipse with a governing radius of curvature of 62 mm, that is, the polygon minimum had been overstated. |
+| 2026-07-30 | R6 applied and **approved**. The procedure grew from 8 steps to 12. Findings: drawn joint lines are unreliable as a source of levels on a rendered reference (shading gives equally dark pixels); joint lines cut the mask of the figure and require gaps to be closed; the reference's own asymmetry turned out to be four times the measurement tolerance, hence the requirement to compare full bounding measurements rather than half-widths; measured bounding measurements are fed back into R2 — an assumed torso radius of 150 mm turned out to be an ellipse with a governing radius of curvature of 62 mm, that is, the polygon minimum had been overstated. |
 | 2026-07-30 | R5 added — setting up the scene for the reference, and failure mode A9 (dimensionless scene). |
 | 2026-07-30 | R5 applied and **approved**. From the results of the trial the procedure grew from 8 steps to 10: judging the reference's fitness became numeric, and separate normalisation of the views plus an instrumental check of placement by measuring a screenshot were added. An interaction with R1 was noted: "exactly one camera" forces the camera's viewport display size to be shrunk and the check renders to be taken with a single camera. |
 | 2026-07-30 | An exception was added to R1: an untouched editor startup file (`is_dirty == False`, default contents) is cleaned without asking for confirmation. The inventory is published as before. |
